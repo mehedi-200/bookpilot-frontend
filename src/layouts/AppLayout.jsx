@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import { NAV_ITEMS, BOTTOM_NAV, MORE_ITEMS, PAGE_TITLES } from '@/layouts/nav'
 import { useTheme } from '@/hooks/useTheme'
-import { clearToken } from '@/services/api'
+import { useAuth } from '@/hooks/useAuth'
 import SearchInput from '@/components/SearchInput'
 import { IconButton } from '@/components/Button'
 
@@ -25,7 +25,12 @@ export default function AppLayout() {
   )
   const [moreOpen, setMoreOpen] = useState(false)
   const location = useLocation()
+  const { isAdmin } = useAuth()
   const title = PAGE_TITLES[location.pathname] ?? 'BookPilot'
+
+  const canSee = (item) => !item.adminOnly || isAdmin
+  const navItems = NAV_ITEMS.filter(canSee)
+  const moreItems = MORE_ITEMS.filter(canSee)
 
   const toggleSidebar = () => {
     setCollapsed((c) => {
@@ -83,7 +88,7 @@ export default function AppLayout() {
           }`}
         >
           <nav className="flex-1 space-y-0.5 p-2">
-            {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+            {navItems.map(({ to, label, icon: Icon }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -136,7 +141,7 @@ export default function AppLayout() {
           type="button"
           onClick={() => setMoreOpen(true)}
           className={`flex flex-1 flex-col items-center justify-center gap-0.5 text-[11px] ${
-            MORE_ITEMS.some((i) => location.pathname.startsWith(i.to))
+            moreItems.some((i) => location.pathname.startsWith(i.to))
               ? 'font-medium text-accent'
               : 'text-ink-muted'
           }`}
@@ -161,7 +166,7 @@ export default function AppLayout() {
               </IconButton>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              {[...MORE_ITEMS, { to: '/profile', label: 'Profile', icon: User }].map(
+              {[...moreItems, { to: '/profile', label: 'Profile', icon: User }].map(
                 ({ to, label, icon: Icon }) => (
                   <NavLink
                     key={to}
@@ -201,6 +206,7 @@ function ProfileMenu() {
   const ref = useRef(null)
   const navigate = useNavigate()
   const { theme, setTheme, themes } = useTheme()
+  const { user, logout: doLogout } = useAuth()
 
   useEffect(() => {
     const onDown = (e) => {
@@ -210,10 +216,18 @@ function ProfileMenu() {
     return () => document.removeEventListener('mousedown', onDown)
   }, [])
 
-  const logout = () => {
-    clearToken()
+  const logout = async () => {
+    await doLogout()
     navigate('/login')
   }
+
+  const initials =
+    user?.name
+      ?.split(' ')
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase() || '…'
 
   return (
     <div ref={ref} className="relative">
@@ -223,10 +237,16 @@ function ProfileMenu() {
         onClick={() => setOpen((o) => !o)}
         className="flex size-8 items-center justify-center rounded-full bg-surface-2 text-xs font-semibold text-ink"
       >
-        BP
+        {initials}
       </button>
       {open && (
         <div className="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-line bg-surface p-1.5 shadow-lg">
+          {user && (
+            <div className="border-b border-line px-3 py-2">
+              <p className="truncate text-sm font-medium text-ink">{user.name}</p>
+              <p className="truncate text-xs text-ink-muted">{user.email}</p>
+            </div>
+          )}
           <button
             type="button"
             onClick={() => {
