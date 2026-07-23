@@ -4,6 +4,7 @@ import Button, { IconButton } from '@/components/Button'
 import { Input, Select, Textarea } from '@/components/Field'
 import Card from '@/components/Card'
 import StatusChip, { STATUS_TONES } from '@/components/StatusChip'
+import Switch from '@/components/Switch'
 import Modal from '@/components/Modal'
 import ConfirmModal from '@/components/ConfirmModal'
 import DataList from '@/components/DataList'
@@ -30,6 +31,7 @@ export default function UiKit() {
   const [page, setPage] = useState(3)
   const [perPage, setPerPage] = useState(10)
   const [loading, setLoading] = useState(false)
+  const [switchOn, setSwitchOn] = useState(true)
 
   return (
     <div className="space-y-4">
@@ -57,6 +59,21 @@ export default function UiKit() {
             <option>Full Service</option>
           </Select>
           <Textarea label="Notes" placeholder="Anything useful…" />
+        </div>
+      </Card>
+
+      <Card title="Switches">
+        <div className="flex flex-wrap items-center gap-6">
+          <label className="flex items-center gap-2 text-sm text-ink-muted">
+            <Switch checked={switchOn} label="Demo switch" onChange={setSwitchOn} />
+            {switchOn ? 'On' : 'Off'}
+          </label>
+          <span className="flex items-center gap-2 text-sm text-ink-muted">
+            <Switch checked disabled label="Disabled on" /> disabled on
+          </span>
+          <span className="flex items-center gap-2 text-sm text-ink-muted">
+            <Switch checked={false} disabled label="Disabled off" /> disabled off
+          </span>
         </div>
       </Card>
 
