@@ -14,7 +14,7 @@ export default function Profile() {
   return (
     <div className="space-y-3">
       <PageHeader title="Profile" backTo="/" />
-      <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
+      <div className="grid gap-3 lg:grid-cols-2">
         <ProfileCard />
         <SecurityCard />
         <div className="lg:col-span-2">

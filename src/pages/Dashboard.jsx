@@ -313,7 +313,6 @@ function ActivityChart({ series, loading }) {
 
   return (
     <Card
-      className="h-full"
       title="Booking activity"
       description="A week either side of today"
       actions={
@@ -358,11 +357,7 @@ function AiShare({ share, loading }) {
   const total = share.ai + share.manual
 
   return (
-    <Card
-      className="flex h-full flex-col"
-      title="AI share"
-      description="Last 30 days"
-    >
+    <Card title="AI share" description="Last 30 days">
       <div className="flex flex-1 flex-col items-center justify-center gap-4">
         <DonutChart
           size={150}
@@ -427,11 +422,7 @@ function StatusBreakdown({ counts, loading }) {
   const total = Object.values(counts).reduce((sum, n) => sum + n, 0)
 
   return (
-    <Card
-      className="flex h-full flex-col"
-      title="By status"
-      description={`${total} bookings`}
-    >
+    <Card title="By status" description={`${total} bookings`}>
       {total === 0 ? (
         <EmptyState icon={CalendarX} title="No bookings yet" />
       ) : (
@@ -485,7 +476,6 @@ function TodaySchedule({ bookings, loading }) {
 
   return (
     <Card
-      className="flex h-full flex-col"
       bodyClassName={bookings.length > 0 ? 'p-0' : undefined}
       title="Today’s schedule"
       description={
@@ -558,7 +548,6 @@ function ComingUp({ bookings, loading }) {
 
   return (
     <Card
-      className="flex h-full flex-col"
       bodyClassName={bookings.length > 0 ? 'p-0' : undefined}
       title="Coming up"
       description={

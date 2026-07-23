@@ -340,7 +340,7 @@ function HoursTab() {
   const openDays = days.filter((d) => !d.is_closed).length
 
   return (
-    <div className="grid gap-3 xl:grid-cols-[1fr_320px] xl:items-start">
+    <div className="grid gap-3 xl:grid-cols-[1fr_320px]">
       <div className="space-y-3">
         <Card
           title="Weekly hours"
@@ -479,6 +479,7 @@ function ClosedDatesCard({ closedDates }) {
     <Card
       title="Holidays & closures"
       description="One-off days the business is shut, on top of the weekly pattern."
+      bodyClassName="flex flex-col"
     >
       {closedDates.length === 0 ? (
         <p className="flex items-center gap-2 rounded-lg bg-surface-2 p-3 text-sm text-ink-muted">
@@ -507,7 +508,7 @@ function ClosedDatesCard({ closedDates }) {
         </ul>
       )}
 
-      <div className="flex flex-wrap items-end gap-2">
+      <div className="mt-auto flex flex-wrap items-end gap-2 border-t border-line pt-4">
         <Input
           label="Date"
           type="date"
@@ -598,7 +599,7 @@ function WidgetTab() {
         </div>
       </div>
 
-      <div className="grid gap-3 xl:grid-cols-2 xl:items-start">
+      <div className="grid gap-3 xl:grid-cols-2">
         <Card
           title="Install"
           description="Paste this one line before the closing </body> tag of your website."

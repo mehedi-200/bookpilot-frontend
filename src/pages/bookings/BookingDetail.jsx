@@ -193,7 +193,7 @@ export default function BookingDetail() {
         </div>
       )}
 
-      <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
+      <div className="grid gap-3 lg:grid-cols-2">
         <Card title="Details">
           <dl className="grid gap-3 sm:grid-cols-2">
             <Row icon={Package} label="Service">
