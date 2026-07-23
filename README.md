@@ -1,5 +1,7 @@
 # bookpilot-frontend
 
+[![build](https://github.com/mehedi-200/bookpilot-frontend/actions/workflows/build.yml/badge.svg)](https://github.com/mehedi-200/bookpilot-frontend/actions/workflows/build.yml)
+
 BookPilot Web — React chat widget + dashboard for the BookPilot AI booking agent.
 
 API repo: https://github.com/mehedi-200/bookpilot-backend
@@ -17,7 +19,23 @@ cp .env.example .env          # VITE_API_URL points at the Laravel API
 npm run dev                   # http://localhost:5173
 ```
 
-The backend must be running (see the API repo) — the start page shows a live API connection check.
+The backend must be running (see the API repo). Log in with the seeded admin
+(`admin@bookpilot.test` / `password`); run `php artisan db:seed --class=DemoSeeder`
+in the API repo first if you want a populated dashboard.
+
+## What's in here
+
+Two applications share this codebase:
+
+- **The dashboard** (`src/pages`, `src/layouts`) — bookings, customers,
+  conversations, services, staff, settings, integrations. Three themes
+  (dark default, light, reading), a collapsible desktop sidebar, and a
+  native-app layout with bottom navigation under `lg`.
+- **The chat widget** (`src/widget`) — a separate, self-contained bundle that
+  gets embedded on the customer's own website. See below.
+
+`/ui-kit` renders every shared component with fake data — the quickest way to
+check a change across all three themes and both layouts.
 
 ## Scripts
 
