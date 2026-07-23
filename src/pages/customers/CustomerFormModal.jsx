@@ -10,7 +10,12 @@ import { applyServerErrors } from '@/hooks/useAuth'
 import { customerService } from '@/services/customerService'
 
 // Shared by the Customers page and (in Feature 5) the booking flow.
-export default function CustomerFormModal({ open, onClose, onSaved, customer = null }) {
+export default function CustomerFormModal({
+  open,
+  onClose,
+  onSaved,
+  customer = null,
+}) {
   const toast = useToast()
   const navigate = useNavigate()
   const isNew = !customer
@@ -33,7 +38,11 @@ export default function CustomerFormModal({ open, onClose, onSaved, customer = n
 
   const mutation = useMutation({
     mutationFn: (form) => {
-      const data = { ...form, email: form.email || null, notes: form.notes || null }
+      const data = {
+        ...form,
+        email: form.email || null,
+        notes: form.notes || null,
+      }
       return isNew
         ? customerService.create(data)
         : customerService.update(customer.id, data)
@@ -70,13 +79,19 @@ export default function CustomerFormModal({ open, onClose, onSaved, customer = n
           <Button variant="secondary" onClick={close}>
             Cancel
           </Button>
-          <Button loading={mutation.isPending} onClick={handleSubmit((d) => mutation.mutate(d))}>
+          <Button
+            loading={mutation.isPending}
+            onClick={handleSubmit((d) => mutation.mutate(d))}
+          >
             {isNew ? 'Add customer' : 'Save changes'}
           </Button>
         </>
       }
     >
-      <form className="space-y-4" onSubmit={handleSubmit((d) => mutation.mutate(d))}>
+      <form
+        className="space-y-4"
+        onSubmit={handleSubmit((d) => mutation.mutate(d))}
+      >
         <Input
           label="Name"
           placeholder="Rahim Uddin"
@@ -93,7 +108,8 @@ export default function CustomerFormModal({ open, onClose, onSaved, customer = n
         {duplicate && (
           <div className="flex items-center justify-between gap-2 rounded-lg border border-line bg-surface-2 p-3">
             <p className="text-sm text-ink">
-              This number belongs to <span className="font-medium">{duplicate.name}</span>.
+              This number belongs to{' '}
+              <span className="font-medium">{duplicate.name}</span>.
             </p>
             <Button
               variant="secondary"
@@ -106,7 +122,12 @@ export default function CustomerFormModal({ open, onClose, onSaved, customer = n
             </Button>
           </div>
         )}
-        <Input label="Email (optional)" type="email" error={errors.email?.message} {...register('email')} />
+        <Input
+          label="Email (optional)"
+          type="email"
+          error={errors.email?.message}
+          {...register('email')}
+        />
         <Textarea
           label="Notes (optional)"
           placeholder="Prefers mornings, has two cars…"

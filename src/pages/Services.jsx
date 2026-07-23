@@ -47,7 +47,9 @@ export default function Services() {
     mutationFn: (service) => catalogService.toggleActive(service.id),
     onSuccess: (updated) => {
       invalidate()
-      toast.success(updated.active ? 'Service activated' : 'Service deactivated')
+      toast.success(
+        updated.active ? 'Service activated' : 'Service deactivated'
+      )
     },
     onError: () => toast.error('Could not update the service'),
   })
@@ -251,8 +253,12 @@ function ServiceFormModal({ editing, onClose, onSaved }) {
       ? { name: '', durationChoice: '30', duration_custom: '', price: '' }
       : {
           name: editing?.name,
-          durationChoice: knownDuration ? String(editing?.duration_minutes) : 'custom',
-          duration_custom: knownDuration ? '' : String(editing?.duration_minutes),
+          durationChoice: knownDuration
+            ? String(editing?.duration_minutes)
+            : 'custom',
+          duration_custom: knownDuration
+            ? ''
+            : String(editing?.duration_minutes),
           price: editing?.price,
         },
   })
@@ -269,7 +275,9 @@ function ServiceFormModal({ editing, onClose, onSaved }) {
             : Number(form.durationChoice),
         price: Number(form.price),
       }
-      return isNew ? catalogService.create(data) : catalogService.update(editing.id, data)
+      return isNew
+        ? catalogService.create(data)
+        : catalogService.update(editing.id, data)
     },
     onSuccess: () => {
       toast.success(isNew ? 'Service added' : 'Service updated')
@@ -290,13 +298,19 @@ function ServiceFormModal({ editing, onClose, onSaved }) {
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>
-          <Button loading={mutation.isPending} onClick={handleSubmit((d) => mutation.mutate(d))}>
+          <Button
+            loading={mutation.isPending}
+            onClick={handleSubmit((d) => mutation.mutate(d))}
+          >
             {isNew ? 'Add service' : 'Save changes'}
           </Button>
         </>
       }
     >
-      <form className="space-y-4" onSubmit={handleSubmit((d) => mutation.mutate(d))}>
+      <form
+        className="space-y-3"
+        onSubmit={handleSubmit((d) => mutation.mutate(d))}
+      >
         <Input
           label="Name"
           placeholder="Full Service"
@@ -318,7 +332,10 @@ function ServiceFormModal({ editing, onClose, onSaved }) {
               type="number"
               min="5"
               max="480"
-              error={errors.duration_minutes?.message || errors.duration_custom?.message}
+              error={
+                errors.duration_minutes?.message ||
+                errors.duration_custom?.message
+              }
               {...register('duration_custom', { required: 'Enter minutes' })}
             />
           ) : (

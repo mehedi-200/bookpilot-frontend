@@ -80,7 +80,9 @@ export default function NewBookingModal({ open, onClose, onCreated }) {
       const serverErrors = err.response?.data?.errors ?? {}
       setErrors(serverErrors)
       const first = Object.values(serverErrors)[0]
-      toast.error(Array.isArray(first) ? first[0] : 'Could not create the booking')
+      toast.error(
+        Array.isArray(first) ? first[0] : 'Could not create the booking'
+      )
     },
   })
 
@@ -126,7 +128,11 @@ export default function NewBookingModal({ open, onClose, onCreated }) {
 
         <div>
           <p className="mb-1.5 text-sm font-medium text-ink">When</p>
-          <SlotPicker serviceId={serviceId} value={startsAt} onChange={setStartsAt} />
+          <SlotPicker
+            serviceId={serviceId}
+            value={startsAt}
+            onChange={setStartsAt}
+          />
           {errors.starts_at && (
             <p className="mt-1 text-xs text-danger">{errors.starts_at[0]}</p>
           )}
@@ -143,7 +149,8 @@ export default function NewBookingModal({ open, onClose, onCreated }) {
           />
           {matched && (
             <p className="flex items-center gap-1.5 text-xs text-ok">
-              <Check size={14} /> Existing customer — booking will be added to their record.
+              <Check size={14} /> Existing customer — booking will be added to
+              their record.
             </p>
           )}
           <Input

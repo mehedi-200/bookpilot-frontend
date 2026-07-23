@@ -47,7 +47,10 @@ export function ToastProvider({ children }) {
               {t.type === 'success' ? (
                 <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-ok" />
               ) : (
-                <AlertCircle size={18} className="mt-0.5 shrink-0 text-danger" />
+                <AlertCircle
+                  size={18}
+                  className="mt-0.5 shrink-0 text-danger"
+                />
               )}
               <p className="flex-1 text-sm text-ink">{t.message}</p>
               <button

@@ -35,7 +35,11 @@ export default function UiKit() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="UI Kit" subtitle="every shared component, all themes" backTo="/" />
+      <PageHeader
+        title="UI Kit"
+        subtitle="every shared component, all themes"
+        backTo="/"
+      />
 
       <Card title="Buttons">
         <div className="flex flex-wrap items-center gap-2">
@@ -53,7 +57,11 @@ export default function UiKit() {
 
       <Card title="Form fields">
         <div className="grid gap-4 lg:grid-cols-3">
-          <Input label="Name" placeholder="Rahim Uddin" hint="Customer full name" />
+          <Input
+            label="Name"
+            placeholder="Rahim Uddin"
+            hint="Customer full name"
+          />
           <Select label="Service" error="Pick a service">
             <option value="">Choose…</option>
             <option>Full Service</option>
@@ -65,14 +73,19 @@ export default function UiKit() {
       <Card title="Switches">
         <div className="flex flex-wrap items-center gap-6">
           <label className="flex items-center gap-2 text-sm text-ink-muted">
-            <Switch checked={switchOn} label="Demo switch" onChange={setSwitchOn} />
+            <Switch
+              checked={switchOn}
+              label="Demo switch"
+              onChange={setSwitchOn}
+            />
             {switchOn ? 'On' : 'Off'}
           </label>
           <span className="flex items-center gap-2 text-sm text-ink-muted">
             <Switch checked disabled label="Disabled on" /> disabled on
           </span>
           <span className="flex items-center gap-2 text-sm text-ink-muted">
-            <Switch checked={false} disabled label="Disabled off" /> disabled off
+            <Switch checked={false} disabled label="Disabled off" /> disabled
+            off
           </span>
         </div>
       </Card>
@@ -107,10 +120,16 @@ export default function UiKit() {
           <Button variant="secondary" onClick={() => setConfirm(true)}>
             Open ConfirmModal
           </Button>
-          <Button variant="secondary" onClick={() => toast.success('Booking saved')}>
+          <Button
+            variant="secondary"
+            onClick={() => toast.success('Booking saved')}
+          >
             Success toast
           </Button>
-          <Button variant="secondary" onClick={() => toast.error('API unreachable — try again')}>
+          <Button
+            variant="secondary"
+            onClick={() => toast.error('API unreachable — try again')}
+          >
             Error toast
           </Button>
         </div>
@@ -157,7 +176,10 @@ export default function UiKit() {
             >
               Simulate loading
             </Button>
-            <SearchInput className="w-full md:ml-auto md:w-64" onChange={() => {}} />
+            <SearchInput
+              className="w-full md:ml-auto md:w-64"
+              onChange={() => {}}
+            />
           </>
         }
         empty={{
@@ -166,7 +188,12 @@ export default function UiKit() {
           hint: 'They appear here as soon as the AI books one.',
         }}
         pagination={{
-          meta: { current_page: page, last_page: 12, total: 113, per_page: perPage },
+          meta: {
+            current_page: page,
+            last_page: 12,
+            total: 113,
+            per_page: perPage,
+          },
           onPage: setPage,
           onPerPage: setPerPage,
           onRefresh: () => toast.success('Refreshed'),
@@ -187,7 +214,8 @@ export default function UiKit() {
         }
       >
         <p className="text-sm text-ink-muted">
-          Centered dialog on desktop — bottom sheet with a drag handle on mobile.
+          Centered dialog on desktop — bottom sheet with a drag handle on
+          mobile.
         </p>
       </Modal>
 

@@ -20,7 +20,9 @@ export default function PageHeader({ title, subtitle, backTo, actions }) {
       )}
       <h1 className="text-base font-semibold text-ink">{title}</h1>
       {subtitle && <span className="text-sm text-ink-muted">{subtitle}</span>}
-      {actions && <div className="ml-auto flex items-center gap-2">{actions}</div>}
+      {actions && (
+        <div className="ml-auto flex items-center gap-2">{actions}</div>
+      )}
     </div>
   )
 }

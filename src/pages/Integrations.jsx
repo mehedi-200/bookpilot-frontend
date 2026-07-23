@@ -43,7 +43,8 @@ export default function Integrations() {
         base_url: baseUrl,
         api_token: token || '',
         default_mechanic_id: mechanicId || null,
-        default_mechanic_name: chosen?.name ?? integration?.default_mechanic_name ?? null,
+        default_mechanic_name:
+          chosen?.name ?? integration?.default_mechanic_name ?? null,
         enabled,
         ...overrides,
       })
@@ -54,7 +55,10 @@ export default function Integrations() {
       toast.success('Integration saved')
     },
     onError: (err) =>
-      toast.error(err.response?.data?.errors?.base_url?.[0] ?? 'Could not save the integration'),
+      toast.error(
+        err.response?.data?.errors?.base_url?.[0] ??
+          'Could not save the integration'
+      ),
   })
 
   const testMutation = useMutation({
@@ -93,7 +97,7 @@ export default function Integrations() {
   const connected = integration?.last_ok_at && !integration?.last_error
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
+    <div className="space-y-3">
       <Card>
         <div className="flex items-start gap-3">
           <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent">
@@ -109,74 +113,86 @@ export default function Integrations() {
         </div>
       </Card>
 
-      <Card title="Connection">
-        <div className="space-y-4">
-          <Input
-            label="GarageFlow URL"
-            placeholder="https://garage.example.com"
-            value={baseUrl}
-            onChange={(e) => setBaseUrl(e.target.value)}
-            hint="The address you use to open GarageFlow, without /api."
-          />
-          <Input
-            label="API token"
-            type="password"
-            placeholder={integration?.has_token ? integration.masked_token : 'Paste a GarageFlow API token'}
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            hint={
-              integration?.has_token
-                ? 'A token is saved. Leave blank to keep it.'
-                : 'Log in to GarageFlow as an admin and create an API token.'
-            }
-          />
+      <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
+        <Card title="Connection">
+          <div className="space-y-4">
+            <Input
+              label="GarageFlow URL"
+              placeholder="https://garage.example.com"
+              value={baseUrl}
+              onChange={(e) => setBaseUrl(e.target.value)}
+              hint="The address you use to open GarageFlow, without /api."
+            />
+            <Input
+              label="API token"
+              type="password"
+              placeholder={
+                integration?.has_token
+                  ? integration.masked_token
+                  : 'Paste a GarageFlow API token'
+              }
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              hint={
+                integration?.has_token
+                  ? 'A token is saved. Leave blank to keep it.'
+                  : 'Log in to GarageFlow as an admin and create an API token.'
+              }
+            />
 
-          <div className="flex flex-wrap items-center gap-3">
-            <Button
-              variant="secondary"
-              loading={testMutation.isPending}
-              disabled={!baseUrl}
-              onClick={() => {
-                setTestResult(null)
-                testMutation.mutate()
-              }}
-            >
-              <Plug size={15} /> Test connection
-            </Button>
-
-            {testResult && (
-              <span
-                className={`flex items-center gap-1.5 text-sm ${
-                  testResult.ok ? 'text-ok' : 'text-danger'
-                }`}
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                variant="secondary"
+                loading={testMutation.isPending}
+                disabled={!baseUrl}
+                onClick={() => {
+                  setTestResult(null)
+                  testMutation.mutate()
+                }}
               >
-                {testResult.ok ? <CheckCircle2 size={15} /> : <AlertCircle size={15} />}
-                {testResult.message}
-              </span>
-            )}
-          </div>
-        </div>
-      </Card>
+                <Plug size={15} /> Test connection
+              </Button>
 
-      <Card title="Job defaults">
-        <Select
-          label="Assign new jobs to"
-          value={mechanicId}
-          onChange={(e) => setMechanicId(e.target.value)}
-          hint="GarageFlow requires a mechanic on every service job."
-          disabled={!mechanics}
-        >
-          <option value="">
-            {mechanics ? 'Choose a mechanic…' : 'Test the connection to load mechanics'}
-          </option>
-          {(mechanics ?? []).map((mechanic) => (
-            <option key={mechanic.id} value={mechanic.id}>
-              {mechanic.name}
-              {mechanic.role ? ` · ${mechanic.role}` : ''}
+              {testResult && (
+                <span
+                  className={`flex items-center gap-1.5 text-sm ${
+                    testResult.ok ? 'text-ok' : 'text-danger'
+                  }`}
+                >
+                  {testResult.ok ? (
+                    <CheckCircle2 size={15} />
+                  ) : (
+                    <AlertCircle size={15} />
+                  )}
+                  {testResult.message}
+                </span>
+              )}
+            </div>
+          </div>
+        </Card>
+
+        <Card title="Job defaults">
+          <Select
+            label="Assign new jobs to"
+            value={mechanicId}
+            onChange={(e) => setMechanicId(e.target.value)}
+            hint="GarageFlow requires a mechanic on every service job."
+            disabled={!mechanics}
+          >
+            <option value="">
+              {mechanics
+                ? 'Choose a mechanic…'
+                : 'Test the connection to load mechanics'}
             </option>
-          ))}
-        </Select>
-      </Card>
+            {(mechanics ?? []).map((mechanic) => (
+              <option key={mechanic.id} value={mechanic.id}>
+                {mechanic.name}
+                {mechanic.role ? ` · ${mechanic.role}` : ''}
+              </option>
+            ))}
+          </Select>
+        </Card>
+      </div>
 
       <Card title="Sync">
         <div className="flex items-start justify-between gap-4">
@@ -200,7 +216,10 @@ export default function Integrations() {
       </Card>
 
       <div className="flex justify-end">
-        <Button loading={saveMutation.isPending} onClick={() => saveMutation.mutate()}>
+        <Button
+          loading={saveMutation.isPending}
+          onClick={() => saveMutation.mutate()}
+        >
           Save changes
         </Button>
       </div>
@@ -225,7 +244,8 @@ function StatusLine({ integration, connected }) {
     return (
       <p className="mt-2 flex items-center gap-1.5 text-sm text-ok">
         <CheckCircle2 size={15} />
-        Connected — last successful call {friendlyDateTime(integration.last_ok_at)}
+        Connected — last successful call{' '}
+        {friendlyDateTime(integration.last_ok_at)}
       </p>
     )
   }

@@ -28,6 +28,22 @@ export function friendlyDateTime(iso) {
   })}`
 }
 
+/** True when the timestamp falls on today's date. */
+export function isToday(iso) {
+  if (!iso) return false
+  const date = new Date(iso)
+  const now = new Date()
+  return (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate()
+  )
+}
+
+export function isPast(iso) {
+  return iso ? new Date(iso).getTime() < Date.now() : false
+}
+
 export function timeLabel(iso) {
   if (!iso) return '—'
   return new Date(iso).toLocaleTimeString(undefined, {

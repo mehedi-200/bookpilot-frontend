@@ -12,11 +12,15 @@ import { authService } from '@/services/authService'
 
 export default function Profile() {
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
+    <div className="space-y-3">
       <PageHeader title="Profile" backTo="/" />
-      <ProfileCard />
-      <SecurityCard />
-      <ThemeCard />
+      <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
+        <ProfileCard />
+        <SecurityCard />
+        <div className="lg:col-span-2">
+          <ThemeCard />
+        </div>
+      </div>
     </div>
   )
 }
@@ -45,7 +49,8 @@ function ProfileCard() {
       toast.success('Profile updated')
     },
     onError: (err) => {
-      if (!applyServerErrors(err, setError)) toast.error('Could not save profile')
+      if (!applyServerErrors(err, setError))
+        toast.error('Could not save profile')
     },
   })
 
@@ -67,7 +72,11 @@ function ProfileCard() {
           {...register('email', { required: 'Email is required' })}
         />
         <div className="flex justify-end">
-          <Button type="submit" loading={mutation.isPending} disabled={!isDirty}>
+          <Button
+            type="submit"
+            loading={mutation.isPending}
+            disabled={!isDirty}
+          >
             Save changes
           </Button>
         </div>
@@ -89,13 +98,18 @@ function SecurityCard() {
 
   const mutation = useMutation({
     mutationFn: (data) =>
-      authService.updateProfile({ name: user.name, email: user.email, ...data }),
+      authService.updateProfile({
+        name: user.name,
+        email: user.email,
+        ...data,
+      }),
     onSuccess: () => {
       reset()
       toast.success('Password changed')
     },
     onError: (err) => {
-      if (!applyServerErrors(err, setError)) toast.error('Could not change password')
+      if (!applyServerErrors(err, setError))
+        toast.error('Could not change password')
     },
   })
 
@@ -110,7 +124,9 @@ function SecurityCard() {
           type="password"
           autoComplete="current-password"
           error={errors.current_password?.message}
-          {...register('current_password', { required: 'Enter your current password' })}
+          {...register('current_password', {
+            required: 'Enter your current password',
+          })}
         />
         <div className="grid gap-4 lg:grid-cols-2">
           <Input
@@ -128,7 +144,9 @@ function SecurityCard() {
             type="password"
             autoComplete="new-password"
             error={errors.password_confirmation?.message}
-            {...register('password_confirmation', { required: 'Confirm the new password' })}
+            {...register('password_confirmation', {
+              required: 'Confirm the new password',
+            })}
           />
         </div>
         <div className="flex justify-end">
@@ -161,7 +179,9 @@ function ThemeCard() {
               type="button"
               onClick={() => setTheme(t)}
               className={`overflow-hidden rounded-xl border text-left transition-shadow ${
-                theme === t ? 'border-accent ring-2 ring-accent/40' : 'border-line'
+                theme === t
+                  ? 'border-accent ring-2 ring-accent/40'
+                  : 'border-line'
               }`}
             >
               {/* Mini mock of the app in that theme (real theme hexes, not UI colors) */}
@@ -185,7 +205,10 @@ function ThemeCard() {
                   theme === t ? 'text-accent' : 'text-ink-muted'
                 }`}
               >
-                {t} {t === 'dark' && <span className="text-ink-muted">· default</span>}
+                {t}{' '}
+                {t === 'dark' && (
+                  <span className="text-ink-muted">· default</span>
+                )}
               </p>
             </button>
           )
