@@ -1,7 +1,10 @@
 import { Routes, Route } from 'react-router-dom'
 import AppLayout from '@/layouts/AppLayout'
+import PublicLayout from '@/layouts/PublicLayout'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import RequireAdmin from '@/components/RequireAdmin'
+import Landing from '@/pages/public/Landing'
+import Pricing from '@/pages/public/Pricing'
 import Login from '@/pages/Login'
 import NotFound from '@/pages/NotFound'
 import UiKit from '@/pages/UiKit'
@@ -22,6 +25,12 @@ import ConversationDetail from '@/pages/conversations/ConversationDetail'
 function App() {
   return (
     <Routes>
+      {/* Public marketing pages — the product's front door */}
+      <Route element={<PublicLayout />}>
+        <Route path="/welcome" element={<Landing />} />
+        <Route path="/pricing" element={<Pricing />} />
+      </Route>
+
       <Route path="/login" element={<Login />} />
 
       <Route
