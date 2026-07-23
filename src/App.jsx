@@ -15,6 +15,8 @@ import CustomerDetail from '@/pages/customers/CustomerDetail'
 import Bookings from '@/pages/Bookings'
 import BookingDetail from '@/pages/bookings/BookingDetail'
 import Dashboard from '@/pages/Dashboard'
+import Conversations from '@/pages/Conversations'
+import ConversationDetail from '@/pages/conversations/ConversationDetail'
 
 function App() {
   return (
@@ -31,7 +33,8 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/bookings" element={<Bookings />} />
         <Route path="/bookings/:id" element={<BookingDetail />} />
-        <Route path="/conversations" element={<Placeholder title="Conversations" feature={6} />} />
+        <Route path="/conversations" element={<Conversations />} />
+        <Route path="/conversations/:id" element={<ConversationDetail />} />
         <Route path="/customers" element={<Customers />} />
         <Route path="/customers/:id" element={<CustomerDetail />} />
         <Route path="/services" element={<Services />} />
