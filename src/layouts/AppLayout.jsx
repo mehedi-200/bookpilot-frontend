@@ -166,24 +166,25 @@ export default function AppLayout() {
               </IconButton>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              {[...moreItems, { to: '/profile', label: 'Profile', icon: User }].map(
-                ({ to, label, icon: Icon }) => (
-                  <NavLink
-                    key={to}
-                    to={to}
-                    className={({ isActive }) =>
-                      `flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-xl border border-line text-xs ${
-                        isActive
-                          ? 'bg-surface-2 font-medium text-accent'
-                          : 'text-ink-muted active:bg-surface-2'
-                      }`
-                    }
-                  >
-                    <Icon size={22} />
-                    {label}
-                  </NavLink>
-                )
-              )}
+              {[
+                ...moreItems,
+                { to: '/profile', label: 'Profile', icon: User },
+              ].map(({ to, label, icon: Icon }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  className={({ isActive }) =>
+                    `flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-xl border border-line text-xs ${
+                      isActive
+                        ? 'bg-surface-2 font-medium text-accent'
+                        : 'text-ink-muted active:bg-surface-2'
+                    }`
+                  }
+                >
+                  <Icon size={22} />
+                  {label}
+                </NavLink>
+              ))}
             </div>
           </div>
         </div>
@@ -234,7 +235,9 @@ function ProfileMenu() {
         <div className="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-line bg-surface p-1.5 shadow-lg">
           {user && (
             <div className="border-b border-line px-3 py-2">
-              <p className="truncate text-sm font-medium text-ink">{user.name}</p>
+              <p className="truncate text-sm font-medium text-ink">
+                {user.name}
+              </p>
               <p className="truncate text-xs text-ink-muted">{user.email}</p>
             </div>
           )}

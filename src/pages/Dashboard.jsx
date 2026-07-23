@@ -18,10 +18,18 @@ import Card from '@/components/Card'
 import Button from '@/components/Button'
 import EmptyState from '@/components/EmptyState'
 import Skeleton from '@/components/Skeleton'
-import StatusChip, { STATUS_TONES } from '@/components/StatusChip'
+import BarChart from '@/components/charts/BarChart'
+import DonutChart from '@/components/charts/DonutChart'
 import { useAuth } from '@/hooks/useAuth'
 import { dashboardService } from '@/services/dashboardService'
-import { friendlyDateTime, timeLabel, toDateParam } from '@/utils/dates'
+import { friendlyDate, timeLabel, toDateParam } from '@/utils/dates'
+
+const STATUS_COLORS = {
+  pending: 'var(--warn)',
+  confirmed: 'var(--accent)',
+  completed: 'var(--ok)',
+  cancelled: 'var(--danger)',
+}
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -32,11 +40,13 @@ export default function Dashboard() {
     queryFn: dashboardService.get,
   })
 
+  const ready = !isLoading && !!data
+
   return (
     <div className="space-y-3">
       <Greeting name={user?.name} />
 
-      {!isLoading && data && (
+      {ready && (
         <>
           <NeedsAttention needs={data.needs_attention} />
           <OnboardingStrip setup={data.setup_state} />
@@ -44,8 +54,7 @@ export default function Dashboard() {
       )}
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {/* `data` is also missing when the request failed, not just while loading */}
-        {isLoading || !data
+        {!ready
           ? Array.from({ length: 4 }).map((_, i) => <StatSkeleton key={i} />)
           : [
               {
@@ -79,15 +88,19 @@ export default function Dashboard() {
             ].map((stat) => <StatCard key={stat.label} {...stat} />)}
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-5">
-        <div className="lg:col-span-3">
-          <TodaySchedule bookings={data?.today ?? []} loading={isLoading} />
+      {/* Grid items stretch, so both cards in a row end at the same height */}
+      <div className="grid gap-3 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <ActivityChart series={data?.series} loading={!ready} />
         </div>
-        <div className="space-y-3 lg:col-span-2">
-          <AiPerformance share={data?.ai_share} loading={isLoading} />
-          <BookingMix counts={data?.by_status} loading={isLoading} />
-          <ComingUp bookings={data?.upcoming ?? []} loading={isLoading} />
-        </div>
+        <AiShare share={data?.ai_share} loading={!ready} />
+      </div>
+
+      {/* Three equal columns — nothing short sits beside something long */}
+      <div className="grid gap-3 lg:grid-cols-3">
+        <TodaySchedule bookings={data?.today ?? []} loading={!ready} />
+        <ComingUp bookings={data?.upcoming ?? []} loading={!ready} />
+        <StatusBreakdown counts={data?.by_status} loading={!ready} />
       </div>
     </div>
   )
@@ -122,8 +135,6 @@ function Greeting({ name }) {
     </div>
   )
 }
-
-/* ── Attention & onboarding ───────────────────────────────────────────── */
 
 function NeedsAttention({ needs }) {
   const items = [
@@ -204,31 +215,20 @@ function OnboardingStrip({ setup }) {
   const percent = Math.round((done / SETUP_STEPS.length) * 100)
 
   return (
-    <div className="rounded-xl border border-line bg-surface p-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-ink">
-            Finish setting up — {done} of {SETUP_STEPS.length} done
-          </p>
-          <p className="mt-0.5 text-sm text-ink-muted">
-            Your AI can only book what it knows about.
-          </p>
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-3 rounded-xl border border-line bg-surface p-4">
+      <div className="min-w-52 flex-1">
+        <p className="text-sm font-medium text-ink">
+          Finish setting up — {done} of {SETUP_STEPS.length} done
+        </p>
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-2">
+          <div
+            className="h-full rounded-full bg-accent"
+            style={{ width: `${percent}%` }}
+          />
         </div>
-        <Link to={next.to}>
-          <Button variant="secondary">
-            {next.label} <ArrowRight size={15} />
-          </Button>
-        </Link>
       </div>
 
-      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface-2">
-        <div
-          className="h-full rounded-full bg-accent transition-[width]"
-          style={{ width: `${percent}%` }}
-        />
-      </div>
-
-      <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5">
+      <ul className="flex flex-wrap gap-x-4 gap-y-1.5">
         {SETUP_STEPS.map((step) => {
           const complete = setup[step.key]
           return (
@@ -252,6 +252,12 @@ function OnboardingStrip({ setup }) {
           )
         })}
       </ul>
+
+      <Link to={next.to}>
+        <Button variant="secondary">
+          {next.label} <ArrowRight size={15} />
+        </Button>
+      </Link>
     </div>
   )
 }
@@ -297,35 +303,203 @@ function StatSkeleton() {
   )
 }
 
-/* ── Today ────────────────────────────────────────────────────────────── */
+/* ── Charts ───────────────────────────────────────────────────────────── */
+
+function ActivityChart({ series, loading }) {
+  if (loading) return <Skeleton className="h-72 w-full rounded-xl" />
+  if (!series?.length) return null
+
+  const total = series.reduce((sum, day) => sum + day.total, 0)
+
+  return (
+    <Card
+      className="h-full"
+      title="Booking activity"
+      description="A week either side of today"
+      actions={
+        <div className="flex items-center gap-3 text-xs text-ink-muted">
+          <span className="flex items-center gap-1.5">
+            <span
+              className="size-2 rounded-full"
+              style={{ background: 'var(--accent)' }}
+            />
+            AI
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span
+              className="size-2 rounded-full"
+              style={{
+                background:
+                  'color-mix(in srgb, var(--ink-muted) 45%, transparent)',
+              }}
+            />
+            Manual
+          </span>
+        </div>
+      }
+    >
+      {total === 0 ? (
+        <EmptyState
+          icon={CalendarX}
+          title="No bookings in this window"
+          hint="Activity shows up here as soon as bookings come in."
+        />
+      ) : (
+        <BarChart data={series} height={190} />
+      )}
+    </Card>
+  )
+}
+
+function AiShare({ share, loading }) {
+  if (loading) return <Skeleton className="h-72 w-full rounded-xl" />
+  if (!share) return null
+
+  const total = share.ai + share.manual
+
+  return (
+    <Card
+      className="flex h-full flex-col"
+      title="AI share"
+      description="Last 30 days"
+    >
+      <div className="flex flex-1 flex-col items-center justify-center gap-4">
+        <DonutChart
+          size={150}
+          segments={[
+            { label: 'Booked by AI', value: share.ai, color: 'var(--accent)' },
+            {
+              label: 'Manual',
+              value: share.manual,
+              color: 'color-mix(in srgb, var(--ink-muted) 45%, transparent)',
+            },
+          ]}
+        >
+          <span className="text-2xl leading-none font-semibold text-ink tabular-nums">
+            {share.percent}%
+          </span>
+          <span className="mt-1 text-[11px] text-ink-muted">by AI</span>
+        </DonutChart>
+
+        {total === 0 ? (
+          <p className="text-center text-xs text-ink-muted">
+            No bookings yet in this period.
+          </p>
+        ) : (
+          <div className="grid w-full grid-cols-2 gap-2">
+            <MiniStat
+              icon={Bot}
+              label="AI"
+              value={share.ai}
+              tone="var(--accent)"
+            />
+            <MiniStat
+              icon={Hand}
+              label="Manual"
+              value={share.manual}
+              tone="var(--ink-muted)"
+            />
+          </div>
+        )}
+      </div>
+    </Card>
+  )
+}
+
+function MiniStat({ icon: Icon, label, value, tone }) {
+  return (
+    <div className="rounded-lg bg-surface-2 p-2.5 text-center">
+      <p className="flex items-center justify-center gap-1.5 text-xs text-ink-muted">
+        <Icon size={13} style={{ color: tone }} />
+        {label}
+      </p>
+      <p className="mt-0.5 text-lg leading-none font-semibold text-ink tabular-nums">
+        {value}
+      </p>
+    </div>
+  )
+}
+
+function StatusBreakdown({ counts, loading }) {
+  if (loading) return <Skeleton className="min-h-72 w-full rounded-xl" />
+  if (!counts) return null
+
+  const total = Object.values(counts).reduce((sum, n) => sum + n, 0)
+
+  return (
+    <Card
+      className="flex h-full flex-col"
+      title="By status"
+      description={`${total} bookings`}
+    >
+      {total === 0 ? (
+        <EmptyState icon={CalendarX} title="No bookings yet" />
+      ) : (
+        <div className="flex flex-1 flex-col items-center justify-center gap-4">
+          <DonutChart
+            size={140}
+            thickness={14}
+            segments={Object.entries(counts).map(([status, value]) => ({
+              label: status,
+              value,
+              color: STATUS_COLORS[status],
+            }))}
+          >
+            <span className="text-2xl leading-none font-semibold text-ink tabular-nums">
+              {total}
+            </span>
+            <span className="mt-1 text-[11px] text-ink-muted">total</span>
+          </DonutChart>
+
+          <ul className="grid w-full grid-cols-2 gap-x-3 gap-y-1.5">
+            {Object.entries(counts).map(([status, count]) => (
+              <li key={status}>
+                <Link
+                  to={`/bookings?status=${status}`}
+                  className="flex items-center gap-2 text-xs text-ink-muted hover:text-ink"
+                >
+                  <span
+                    className="size-2 shrink-0 rounded-full"
+                    style={{ background: STATUS_COLORS[status] }}
+                  />
+                  <span className="capitalize">{status}</span>
+                  <span className="ml-auto font-semibold text-ink tabular-nums">
+                    {count}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </Card>
+  )
+}
+
+/* ── Lists ────────────────────────────────────────────────────────────── */
 
 function TodaySchedule({ bookings, loading }) {
   const navigate = useNavigate()
 
+  if (loading) return <Skeleton className="min-h-72 w-full rounded-xl" />
+
   return (
     <Card
+      className="flex h-full flex-col"
+      bodyClassName={bookings.length > 0 ? 'p-0' : undefined}
       title="Today’s schedule"
       description={
-        loading
-          ? undefined
-          : bookings.length === 0
-            ? 'Nothing on the books'
-            : `${bookings.length} ${bookings.length === 1 ? 'appointment' : 'appointments'}`
+        bookings.length === 0
+          ? 'Nothing on the books'
+          : `${bookings.length} ${bookings.length === 1 ? 'appointment' : 'appointments'}`
       }
       actions={
         <Link to="/bookings" className="text-xs text-accent hover:underline">
           View all
         </Link>
       }
-      bodyClassName={bookings.length > 0 && !loading ? 'p-0' : undefined}
     >
-      {loading ? (
-        <div className="space-y-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-14 w-full rounded-lg" />
-          ))}
-        </div>
-      ) : bookings.length === 0 ? (
+      {bookings.length === 0 ? (
         <EmptyState
           icon={CalendarX}
           title="Nothing booked today"
@@ -338,24 +512,21 @@ function TodaySchedule({ bookings, loading }) {
               <button
                 type="button"
                 onClick={() => navigate(`/bookings/${booking.id}`)}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-2"
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-surface-2"
               >
-                {/* Time rail — the times line up so the day reads vertically */}
-                <span className="flex w-16 shrink-0 flex-col items-start">
-                  <span className="text-sm font-semibold text-ink tabular-nums">
+                <span className="w-14 shrink-0">
+                  <span className="block text-sm font-semibold text-ink tabular-nums">
                     {timeLabel(booking.starts_at)}
                   </span>
-                  <span className="text-[11px] text-ink-muted">
+                  <span className="block text-[11px] text-ink-muted">
                     {booking.service?.duration_minutes} min
                   </span>
                 </span>
 
                 <span
-                  className="h-9 w-0.5 shrink-0 rounded-full"
+                  className="h-8 w-0.5 shrink-0 rounded-full"
                   style={{
-                    background: `color-mix(in srgb, var(--${
-                      booking.status === 'confirmed' ? 'accent' : 'warn'
-                    }) 55%, transparent)`,
+                    background: STATUS_COLORS[booking.status] ?? 'var(--line)',
                   }}
                 />
 
@@ -369,13 +540,10 @@ function TodaySchedule({ bookings, loading }) {
                 </span>
 
                 {booking.source === 'widget' ? (
-                  <Bot size={15} className="shrink-0 text-accent" />
+                  <Bot size={14} className="shrink-0 text-accent" />
                 ) : (
-                  <Hand size={15} className="shrink-0 text-ink-muted" />
+                  <Hand size={14} className="shrink-0 text-ink-muted" />
                 )}
-                <StatusChip tone={STATUS_TONES[booking.status]}>
-                  {booking.status}
-                </StatusChip>
               </button>
             </li>
           ))}
@@ -385,154 +553,53 @@ function TodaySchedule({ bookings, loading }) {
   )
 }
 
-/* ── Right column ─────────────────────────────────────────────────────── */
-
-function AiPerformance({ share, loading }) {
-  if (loading) return <Skeleton className="h-40 w-full rounded-xl" />
-  if (!share) return null
-
-  const total = share.ai + share.manual
-
-  return (
-    <Card title="AI performance" description="Last 30 days">
-      {total === 0 ? (
-        <p className="text-sm text-ink-muted">
-          Once your widget is live, this shows how much of the booking work the
-          AI handles for you.
-        </p>
-      ) : (
-        <>
-          <div className="flex items-end gap-2">
-            <span className="text-3xl leading-none font-semibold text-accent tabular-nums">
-              {share.percent}%
-            </span>
-            <span className="pb-0.5 text-sm text-ink-muted">booked by AI</span>
-          </div>
-
-          <div className="mt-3 flex h-2 overflow-hidden rounded-full bg-surface-2">
-            <div
-              className="bg-accent transition-[width]"
-              style={{ width: `${share.percent}%` }}
-            />
-          </div>
-
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <MiniStat
-              icon={Bot}
-              label="By AI"
-              value={share.ai}
-              tone="var(--accent)"
-            />
-            <MiniStat
-              icon={Hand}
-              label="Manual"
-              value={share.manual}
-              tone="var(--ink-muted)"
-            />
-          </div>
-        </>
-      )}
-    </Card>
-  )
-}
-
-function MiniStat({ icon: Icon, label, value, tone }) {
-  return (
-    <div className="rounded-lg bg-surface-2 p-2.5">
-      <p className="flex items-center gap-1.5 text-xs text-ink-muted">
-        <Icon size={13} style={{ color: tone }} />
-        {label}
-      </p>
-      <p className="mt-0.5 text-lg leading-none font-semibold text-ink tabular-nums">
-        {value}
-      </p>
-    </div>
-  )
-}
-
-const MIX_TONES = {
-  pending: 'var(--warn)',
-  confirmed: 'var(--accent)',
-  completed: 'var(--ok)',
-  cancelled: 'var(--danger)',
-}
-
-function BookingMix({ counts, loading }) {
-  if (loading) return <Skeleton className="h-36 w-full rounded-xl" />
-  if (!counts) return null
-
-  const total = Object.values(counts).reduce((sum, n) => sum + n, 0)
-
-  return (
-    <Card title="All bookings" description={`${total} in total`}>
-      {total === 0 ? (
-        <p className="text-sm text-ink-muted">No bookings yet.</p>
-      ) : (
-        <>
-          {/* One bar, four segments — proportions at a glance */}
-          <div className="flex h-2 overflow-hidden rounded-full bg-surface-2">
-            {Object.entries(counts).map(([status, count]) =>
-              count === 0 ? null : (
-                <div
-                  key={status}
-                  title={`${status}: ${count}`}
-                  style={{
-                    width: `${(count / total) * 100}%`,
-                    background: MIX_TONES[status],
-                  }}
-                />
-              )
-            )}
-          </div>
-
-          <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5">
-            {Object.entries(counts).map(([status, count]) => (
-              <li key={status}>
-                <Link
-                  to={`/bookings?status=${status}`}
-                  className="flex items-center gap-2 text-xs text-ink-muted hover:text-ink"
-                >
-                  <span
-                    className="size-2 shrink-0 rounded-full"
-                    style={{ background: MIX_TONES[status] }}
-                  />
-                  <span className="capitalize">{status}</span>
-                  <span className="ml-auto font-semibold text-ink tabular-nums">
-                    {count}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-    </Card>
-  )
-}
-
 function ComingUp({ bookings, loading }) {
-  if (loading) return <Skeleton className="h-32 w-full rounded-xl" />
-  if (bookings.length === 0) return null
+  if (loading) return <Skeleton className="min-h-72 w-full rounded-xl" />
 
   return (
-    <Card title="Coming up" bodyClassName="p-0">
-      <ul className="divide-y divide-line">
-        {bookings.map((booking) => (
-          <li key={booking.id}>
-            <Link
-              to={`/bookings/${booking.id}`}
-              className="flex items-center gap-2 px-4 py-2.5 text-sm transition-colors hover:bg-surface-2"
-            >
-              <span className="min-w-0 flex-1 truncate text-ink">
-                {booking.customer?.name ?? '—'}
-              </span>
-              <span className="shrink-0 text-xs text-ink-muted">
-                {friendlyDateTime(booking.starts_at)}
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <Card
+      className="flex h-full flex-col"
+      bodyClassName={bookings.length > 0 ? 'p-0' : undefined}
+      title="Coming up"
+      description={
+        bookings.length > 0 ? 'The next few appointments' : undefined
+      }
+    >
+      {bookings.length === 0 ? (
+        <EmptyState
+          icon={CalendarX}
+          title="Nothing scheduled"
+          hint="Future bookings will show up here."
+        />
+      ) : (
+        <ul className="divide-y divide-line">
+          {bookings.map((booking) => (
+            <li key={booking.id}>
+              <Link
+                to={`/bookings/${booking.id}`}
+                className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-surface-2"
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm text-ink">
+                    {booking.customer?.name ?? '—'}
+                  </span>
+                  <span className="block truncate text-xs text-ink-muted">
+                    {booking.service?.name}
+                  </span>
+                </span>
+                <span className="shrink-0 text-right">
+                  <span className="block text-xs font-medium text-ink">
+                    {friendlyDate(booking.starts_at)}
+                  </span>
+                  <span className="block text-[11px] text-ink-muted tabular-nums">
+                    {timeLabel(booking.starts_at)}
+                  </span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </Card>
   )
 }

@@ -92,9 +92,10 @@ export default function BookingDetail() {
     return (
       <div className="space-y-3">
         <Skeleton className="h-9 w-56" />
-        <div className="grid gap-3 lg:grid-cols-3">
-          <Skeleton className="h-64 w-full rounded-xl lg:col-span-2" />
-          <Skeleton className="h-64 w-full rounded-xl" />
+        <Skeleton className="h-32 w-full rounded-xl" />
+        <div className="grid gap-3 lg:grid-cols-2">
+          <Skeleton className="h-56 w-full rounded-xl" />
+          <Skeleton className="h-56 w-full rounded-xl" />
         </div>
       </div>
     )
@@ -117,174 +118,161 @@ export default function BookingDetail() {
         }
       />
 
-      <div className="grid gap-3 lg:grid-cols-3">
-        {/* Main column */}
-        <div className="space-y-3 lg:col-span-2">
-          {/* The appointment time is what everyone opens this page for */}
-          <div className="rounded-xl border border-line bg-surface p-4">
-            <div className="flex flex-wrap items-center gap-4">
-              <span
-                className="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl"
-                style={{
-                  color: 'var(--accent)',
-                  background:
-                    'color-mix(in srgb, var(--accent) 12%, transparent)',
-                }}
-              >
-                <CalendarClock size={22} />
-              </span>
-              <div className="min-w-0">
-                <p className="text-lg font-semibold text-ink">
-                  {friendlyDate(booking.starts_at)} at{' '}
-                  {timeLabel(booking.starts_at)}
-                </p>
-                <p className="text-sm text-ink-muted">
-                  {booking.service?.name} · {booking.service?.duration_minutes}{' '}
-                  minutes
-                  {booking.service?.price
-                    ? ` · ${Number(booking.service.price).toFixed(2)}`
-                    : ''}
-                </p>
-              </div>
-              <div className="ml-auto">
-                <SourceIcon source={booking.source} />
-              </div>
-            </div>
+      {/* The appointment time is what everyone opens this page for */}
+      <div className="rounded-xl border border-line bg-surface p-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <span
+            className="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl"
+            style={{
+              color: 'var(--accent)',
+              background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
+            }}
+          >
+            <CalendarClock size={22} />
+          </span>
+          <div className="min-w-0">
+            <p className="text-lg font-semibold text-ink">
+              {friendlyDate(booking.starts_at)} at{' '}
+              {timeLabel(booking.starts_at)}
+            </p>
+            <p className="text-sm text-ink-muted">
+              {booking.service?.name} · {booking.service?.duration_minutes}{' '}
+              minutes
+              {booking.service?.price
+                ? ` · ${Number(booking.service.price).toFixed(2)}`
+                : ''}
+            </p>
+          </div>
+          <div className="ml-auto">
+            <SourceIcon source={booking.source} />
+          </div>
+        </div>
 
-            {/* Action zone — only ever the one legal next step */}
-            {(next || booking.is_cancellable) && (
-              <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4">
-                {next && (
-                  <Button
-                    loading={statusMutation.isPending}
-                    onClick={() =>
-                      statusMutation.mutate({ status: booking.next_status })
-                    }
-                  >
-                    <NextIcon size={16} /> {next.label}
-                  </Button>
-                )}
-                {booking.is_cancellable && (
-                  <>
-                    <Button
-                      variant="secondary"
-                      onClick={() => setRescheduling(true)}
-                    >
-                      <CalendarSync size={15} /> Reschedule
-                    </Button>
-                    <Button variant="ghost" onClick={() => setCancelling(true)}>
-                      <Ban size={15} /> Cancel
-                    </Button>
-                  </>
-                )}
-              </div>
+        {/* Action zone — only ever the one legal next step */}
+        {(next || booking.is_cancellable) && (
+          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4">
+            {next && (
+              <Button
+                loading={statusMutation.isPending}
+                onClick={() =>
+                  statusMutation.mutate({ status: booking.next_status })
+                }
+              >
+                <NextIcon size={16} /> {next.label}
+              </Button>
+            )}
+            {booking.is_cancellable && (
+              <>
+                <Button
+                  variant="secondary"
+                  onClick={() => setRescheduling(true)}
+                >
+                  <CalendarSync size={15} /> Reschedule
+                </Button>
+                <Button variant="ghost" onClick={() => setCancelling(true)}>
+                  <Ban size={15} /> Cancel
+                </Button>
+              </>
             )}
           </div>
+        )}
+      </div>
 
-          {booking.status === 'cancelled' && (
-            <div
-              className="rounded-xl border p-3.5 text-sm"
-              style={{
-                borderColor:
-                  'color-mix(in srgb, var(--danger) 30%, transparent)',
-                background:
-                  'color-mix(in srgb, var(--danger) 7%, var(--surface))',
-              }}
-            >
-              <span className="font-medium text-danger">Cancelled</span>
-              {booking.cancel_reason && (
-                <span className="text-ink-muted">
-                  {' '}
-                  — {booking.cancel_reason}
-                </span>
-              )}
-            </div>
+      {booking.status === 'cancelled' && (
+        <div
+          className="rounded-xl border p-3.5 text-sm"
+          style={{
+            borderColor: 'color-mix(in srgb, var(--danger) 30%, transparent)',
+            background: 'color-mix(in srgb, var(--danger) 7%, var(--surface))',
+          }}
+        >
+          <span className="font-medium text-danger">Cancelled</span>
+          {booking.cancel_reason && (
+            <span className="text-ink-muted"> — {booking.cancel_reason}</span>
           )}
-
-          <Card title="Details">
-            <dl className="grid gap-3 sm:grid-cols-2">
-              <Row icon={Package} label="Service">
-                {booking.service?.name}
-              </Row>
-              <Row icon={User} label="Booked by">
-                {booking.source === 'widget'
-                  ? 'The AI assistant'
-                  : 'A team member'}
-                {booking.conversation_id && (
-                  <Link
-                    to={`/conversations/${booking.conversation_id}`}
-                    className="ml-2 text-accent hover:underline"
-                  >
-                    View the chat
-                  </Link>
-                )}
-              </Row>
-              {booking.rescheduled_from && (
-                <Row icon={History} label="Moved from">
-                  <span className="text-ink-muted line-through">
-                    {friendlyDateTime(booking.rescheduled_from)}
-                  </span>
-                </Row>
-              )}
-              {booking.sync_status && (
-                <Row icon={Wrench} label="GarageFlow">
-                  <SyncStatus booking={booking} onSynced={invalidate} />
-                </Row>
-              )}
-              {booking.notes && (
-                <div className="sm:col-span-2">
-                  <Row icon={StickyNote} label="Notes">
-                    {booking.notes}
-                  </Row>
-                </div>
-              )}
-            </dl>
-          </Card>
         </div>
+      )}
 
-        {/* Sidebar */}
-        <div className="space-y-3">
-          <Card title="Customer">
-            {booking.customer ? (
-              <>
+      <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
+        <Card title="Details">
+          <dl className="grid gap-3 sm:grid-cols-2">
+            <Row icon={Package} label="Service">
+              {booking.service?.name}
+            </Row>
+            <Row icon={User} label="Booked by">
+              {booking.source === 'widget'
+                ? 'The AI assistant'
+                : 'A team member'}
+              {booking.conversation_id && (
                 <Link
-                  to={`/customers/${booking.customer.id}`}
-                  className="flex items-center gap-3 rounded-lg transition-colors hover:opacity-80"
+                  to={`/conversations/${booking.conversation_id}`}
+                  className="ml-2 text-accent hover:underline"
                 >
-                  <Avatar name={booking.customer.name} size="size-11" />
-                  <div className="min-w-0">
-                    <p className="truncate font-medium text-ink">
-                      {booking.customer.name}
-                    </p>
-                    <p className="text-xs text-ink-muted">View full profile</p>
-                  </div>
+                  View the chat
                 </Link>
-                <div className="mt-3 space-y-1.5 border-t border-line pt-3">
-                  <a
-                    href={`tel:${booking.customer.phone}`}
-                    className="flex items-center gap-2 text-sm text-ink tabular-nums hover:text-accent"
-                  >
-                    <Phone size={14} className="text-ink-muted" />
-                    {booking.customer.phone}
-                  </a>
-                  {booking.customer.email && (
-                    <a
-                      href={`mailto:${booking.customer.email}`}
-                      className="flex items-center gap-2 truncate text-sm text-ink hover:text-accent"
-                    >
-                      <Mail size={14} className="text-ink-muted" />
-                      {booking.customer.email}
-                    </a>
-                  )}
-                </div>
-              </>
-            ) : (
-              <p className="text-sm text-ink-muted">
-                No customer on this booking.
-              </p>
+              )}
+            </Row>
+            {booking.rescheduled_from && (
+              <Row icon={History} label="Moved from">
+                <span className="text-ink-muted line-through">
+                  {friendlyDateTime(booking.rescheduled_from)}
+                </span>
+              </Row>
             )}
-          </Card>
-        </div>
+            {booking.sync_status && (
+              <Row icon={Wrench} label="GarageFlow">
+                <SyncStatus booking={booking} onSynced={invalidate} />
+              </Row>
+            )}
+            {booking.notes && (
+              <div className="sm:col-span-2">
+                <Row icon={StickyNote} label="Notes">
+                  {booking.notes}
+                </Row>
+              </div>
+            )}
+          </dl>
+        </Card>
+        <Card title="Customer">
+          {booking.customer ? (
+            <>
+              <Link
+                to={`/customers/${booking.customer.id}`}
+                className="flex items-center gap-3 rounded-lg transition-colors hover:opacity-80"
+              >
+                <Avatar name={booking.customer.name} size="size-11" />
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-ink">
+                    {booking.customer.name}
+                  </p>
+                  <p className="text-xs text-ink-muted">View full profile</p>
+                </div>
+              </Link>
+              <div className="mt-3 space-y-1.5 border-t border-line pt-3">
+                <a
+                  href={`tel:${booking.customer.phone}`}
+                  className="flex items-center gap-2 text-sm text-ink tabular-nums hover:text-accent"
+                >
+                  <Phone size={14} className="text-ink-muted" />
+                  {booking.customer.phone}
+                </a>
+                {booking.customer.email && (
+                  <a
+                    href={`mailto:${booking.customer.email}`}
+                    className="flex items-center gap-2 truncate text-sm text-ink hover:text-accent"
+                  >
+                    <Mail size={14} className="text-ink-muted" />
+                    {booking.customer.email}
+                  </a>
+                )}
+              </div>
+            </>
+          ) : (
+            <p className="text-sm text-ink-muted">
+              No customer on this booking.
+            </p>
+          )}
+        </Card>
       </div>
 
       <Modal

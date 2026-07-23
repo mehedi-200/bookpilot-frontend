@@ -17,11 +17,25 @@ import ConfirmModal from '@/components/ConfirmModal'
 import Skeleton from '@/components/Skeleton'
 import Avatar from '@/components/Avatar'
 import StatusChip, { STATUS_TONES } from '@/components/StatusChip'
-import { friendlyDateTime } from '@/utils/dates'
+import { friendlyDate, friendlyDateTime } from '@/utils/dates'
 import { useToast } from '@/components/Toast'
 import { useAuth } from '@/hooks/useAuth'
 import { customerService } from '@/services/customerService'
 import CustomerFormModal from '@/pages/customers/CustomerFormModal'
+
+function MiniCount({ label, value, tone }) {
+  return (
+    <div className="rounded-lg bg-surface-2 px-3 py-2 text-center">
+      <p
+        className="text-lg leading-none font-semibold tabular-nums"
+        style={{ color: tone }}
+      >
+        {value}
+      </p>
+      <p className="mt-1 text-[11px] text-ink-muted">{label}</p>
+    </div>
+  )
+}
 
 export default function CustomerDetail() {
   const { id } = useParams()
@@ -52,9 +66,10 @@ export default function CustomerDetail() {
     return (
       <div className="space-y-3">
         <Skeleton className="h-9 w-48" />
-        <div className="grid gap-3 lg:grid-cols-3">
+        <Skeleton className="h-28 w-full rounded-xl" />
+        <div className="grid gap-3 lg:grid-cols-2">
           <Skeleton className="h-56 w-full rounded-xl" />
-          <Skeleton className="h-56 w-full rounded-xl lg:col-span-2" />
+          <Skeleton className="h-56 w-full rounded-xl" />
         </div>
       </div>
     )
@@ -81,116 +96,132 @@ export default function CustomerDetail() {
         }
       />
 
-      <div className="grid gap-3 lg:grid-cols-3 lg:items-start">
-        <Card>
-          <div className="flex items-start gap-4">
-            <Avatar name={customer.name} size="size-12" />
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <p className="text-base font-semibold text-ink">
+      <Card>
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+          <div className="flex min-w-0 items-center gap-4">
+            <Avatar name={customer.name} size="size-14" />
+            <div className="min-w-0">
+              <p className="truncate text-base font-semibold text-ink">
                 {customer.name}
               </p>
-              <p className="flex items-center gap-2 text-sm text-ink-muted">
-                <Phone size={14} />
-                <a
-                  href={`tel:${customer.phone}`}
-                  className="text-accent hover:underline"
-                >
-                  {customer.phone}
-                </a>
+              <p className="text-xs text-ink-muted">
+                Customer since {friendlyDate(customer.created_at)}
               </p>
-              {customer.email && (
-                <p className="flex items-center gap-2 text-sm text-ink-muted">
-                  <Mail size={14} />
-                  <a
-                    href={`mailto:${customer.email}`}
-                    className="hover:underline"
-                  >
-                    {customer.email}
-                  </a>
-                </p>
-              )}
-              {customer.notes && (
-                <p className="rounded-lg bg-surface-2 p-2.5 text-sm text-ink">
-                  {customer.notes}
-                </p>
-              )}
             </div>
           </div>
+
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <a
+              href={`tel:${customer.phone}`}
+              className="flex items-center gap-2 text-sm text-ink tabular-nums hover:text-accent"
+            >
+              <Phone size={15} className="text-ink-muted" />
+              {customer.phone}
+            </a>
+            {customer.email && (
+              <a
+                href={`mailto:${customer.email}`}
+                className="flex items-center gap-2 text-sm text-ink hover:text-accent"
+              >
+                <Mail size={15} className="text-ink-muted" />
+                {customer.email}
+              </a>
+            )}
+          </div>
+
+          <div className="ml-auto flex gap-2">
+            <MiniCount
+              label="Bookings"
+              value={customer.bookings_count ?? 0}
+              tone="var(--accent)"
+            />
+            <MiniCount
+              label="Chats"
+              value={(customer.conversations ?? []).length}
+              tone="var(--grape)"
+            />
+          </div>
+        </div>
+
+        {customer.notes && (
+          <p className="mt-3 rounded-lg bg-surface-2 p-2.5 text-sm text-ink">
+            {customer.notes}
+          </p>
+        )}
+      </Card>
+
+      <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
+        <Card title={`Bookings (${customer.bookings_count ?? 0})`}>
+          {(customer.bookings ?? []).length === 0 ? (
+            <EmptyState
+              icon={CalendarCheck}
+              title="No bookings yet"
+              hint="Bookings made for this customer will appear here."
+            />
+          ) : (
+            <ul className="divide-y divide-line">
+              {customer.bookings.map((booking) => (
+                <li key={booking.id}>
+                  <Link
+                    to={`/bookings/${booking.id}`}
+                    className="flex items-center gap-3 py-2.5 transition-colors hover:bg-surface-2"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm text-ink">
+                        {booking.service?.name}
+                      </p>
+                      <p className="text-xs text-ink-muted">
+                        {booking.reference} ·{' '}
+                        {friendlyDateTime(booking.starts_at)}
+                      </p>
+                    </div>
+                    <StatusChip tone={STATUS_TONES[booking.status]}>
+                      {booking.status}
+                    </StatusChip>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
 
-        <div className="space-y-3 lg:col-span-2">
-          <Card title={`Bookings (${customer.bookings_count ?? 0})`}>
-            {(customer.bookings ?? []).length === 0 ? (
-              <EmptyState
-                icon={CalendarCheck}
-                title="No bookings yet"
-                hint="Bookings made for this customer will appear here."
-              />
-            ) : (
-              <ul className="divide-y divide-line">
-                {customer.bookings.map((booking) => (
-                  <li key={booking.id}>
-                    <Link
-                      to={`/bookings/${booking.id}`}
-                      className="flex items-center gap-3 py-2.5 transition-colors hover:bg-surface-2"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm text-ink">
-                          {booking.service?.name}
-                        </p>
-                        <p className="text-xs text-ink-muted">
-                          {booking.reference} ·{' '}
-                          {friendlyDateTime(booking.starts_at)}
-                        </p>
-                      </div>
-                      <StatusChip tone={STATUS_TONES[booking.status]}>
-                        {booking.status}
-                      </StatusChip>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
-
-          <Card title="Conversations">
-            {(customer.conversations ?? []).length === 0 ? (
-              <EmptyState
-                icon={MessageSquare}
-                title="No conversations yet"
-                hint="Chats with the AI assistant will appear here."
-              />
-            ) : (
-              <ul className="divide-y divide-line">
-                {customer.conversations.map((conversation) => (
-                  <li key={conversation.id}>
-                    <Link
-                      to={`/conversations/${conversation.id}`}
-                      className="flex items-center gap-3 py-2.5 transition-colors hover:bg-surface-2"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm text-ink">
-                          {conversation.preview ?? 'Conversation'}
-                        </p>
-                        <p className="text-xs text-ink-muted">
-                          {friendlyDateTime(
-                            conversation.last_activity_at ??
-                              conversation.started_at
-                          )}
-                        </p>
-                      </div>
-                      <StatusChip tone={STATUS_TONES[conversation.status]}>
-                        {conversation.status === 'handed_off'
-                          ? 'needs a human'
-                          : conversation.status}
-                      </StatusChip>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
-        </div>
+        <Card title="Conversations">
+          {(customer.conversations ?? []).length === 0 ? (
+            <EmptyState
+              icon={MessageSquare}
+              title="No conversations yet"
+              hint="Chats with the AI assistant will appear here."
+            />
+          ) : (
+            <ul className="divide-y divide-line">
+              {customer.conversations.map((conversation) => (
+                <li key={conversation.id}>
+                  <Link
+                    to={`/conversations/${conversation.id}`}
+                    className="flex items-center gap-3 py-2.5 transition-colors hover:bg-surface-2"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm text-ink">
+                        {conversation.preview ?? 'Conversation'}
+                      </p>
+                      <p className="text-xs text-ink-muted">
+                        {friendlyDateTime(
+                          conversation.last_activity_at ??
+                            conversation.started_at
+                        )}
+                      </p>
+                    </div>
+                    <StatusChip tone={STATUS_TONES[conversation.status]}>
+                      {conversation.status === 'handed_off'
+                        ? 'needs a human'
+                        : conversation.status}
+                    </StatusChip>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
       </div>
 
       <CustomerFormModal

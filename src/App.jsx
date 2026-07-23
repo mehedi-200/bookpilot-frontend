@@ -39,9 +39,30 @@ function App() {
         <Route path="/customers" element={<Customers />} />
         <Route path="/customers/:id" element={<CustomerDetail />} />
         <Route path="/services" element={<Services />} />
-        <Route path="/staff" element={<RequireAdmin><Staff /></RequireAdmin>} />
-        <Route path="/integrations" element={<RequireAdmin><Integrations /></RequireAdmin>} />
-        <Route path="/settings" element={<RequireAdmin><Settings /></RequireAdmin>} />
+        <Route
+          path="/staff"
+          element={
+            <RequireAdmin>
+              <Staff />
+            </RequireAdmin>
+          }
+        />
+        <Route
+          path="/integrations"
+          element={
+            <RequireAdmin>
+              <Integrations />
+            </RequireAdmin>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <RequireAdmin>
+              <Settings />
+            </RequireAdmin>
+          }
+        />
         <Route path="/profile" element={<Profile />} />
         <Route path="/search" element={<Search />} />
         <Route path="/ui-kit" element={<UiKit />} />
