@@ -10,6 +10,7 @@ import ConfirmModal from '@/components/ConfirmModal'
 import SearchInput from '@/components/SearchInput'
 import StatusChip from '@/components/StatusChip'
 import { useToast } from '@/components/Toast'
+import Avatar from '@/components/Avatar'
 import { useAuth, applyServerErrors } from '@/hooks/useAuth'
 import { userService } from '@/services/userService'
 import { friendlyDate } from '@/utils/dates'
@@ -193,20 +194,6 @@ function RowActions({ user, me, onEdit, onToggle }) {
           )}
         </IconButton>
       )}
-    </span>
-  )
-}
-
-function Avatar({ name }) {
-  const initials = name
-    .split(' ')
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase()
-  return (
-    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-2 text-xs font-semibold text-ink">
-      {initials}
     </span>
   )
 }
