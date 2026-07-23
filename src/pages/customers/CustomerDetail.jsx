@@ -128,11 +128,36 @@ export default function CustomerDetail() {
       </Card>
 
       <Card title="Conversations">
-        <EmptyState
-          icon={MessageSquare}
-          title="No conversations yet"
-          hint="Chats with the AI assistant will appear here (Feature 6)."
-        />
+        {(customer.conversations ?? []).length === 0 ? (
+          <EmptyState
+            icon={MessageSquare}
+            title="No conversations yet"
+            hint="Chats with the AI assistant will appear here."
+          />
+        ) : (
+          <ul className="divide-y divide-line">
+            {customer.conversations.map((conversation) => (
+              <li key={conversation.id}>
+                <Link
+                  to={`/conversations/${conversation.id}`}
+                  className="flex items-center gap-3 py-2.5 transition-colors hover:bg-surface-2"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm text-ink">
+                      {conversation.preview ?? 'Conversation'}
+                    </p>
+                    <p className="text-xs text-ink-muted">
+                      {friendlyDateTime(conversation.last_activity_at ?? conversation.started_at)}
+                    </p>
+                  </div>
+                  <StatusChip tone={STATUS_TONES[conversation.status]}>
+                    {conversation.status === 'handed_off' ? 'needs a human' : conversation.status}
+                  </StatusChip>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </Card>
 
       <CustomerFormModal
