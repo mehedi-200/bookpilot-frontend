@@ -15,6 +15,7 @@ import CustomerDetail from '@/pages/customers/CustomerDetail'
 import Bookings from '@/pages/Bookings'
 import BookingDetail from '@/pages/bookings/BookingDetail'
 import Dashboard from '@/pages/Dashboard'
+import Integrations from '@/pages/Integrations'
 import Conversations from '@/pages/Conversations'
 import ConversationDetail from '@/pages/conversations/ConversationDetail'
 
@@ -39,7 +40,7 @@ function App() {
         <Route path="/customers/:id" element={<CustomerDetail />} />
         <Route path="/services" element={<Services />} />
         <Route path="/staff" element={<RequireAdmin><Staff /></RequireAdmin>} />
-        <Route path="/integrations" element={<RequireAdmin><Placeholder title="Integrations" feature={8} /></RequireAdmin>} />
+        <Route path="/integrations" element={<RequireAdmin><Integrations /></RequireAdmin>} />
         <Route path="/settings" element={<RequireAdmin><Settings /></RequireAdmin>} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/search" element={<Placeholder title="Search" feature={9} />} />
