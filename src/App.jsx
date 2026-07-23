@@ -3,7 +3,6 @@ import AppLayout from '@/layouts/AppLayout'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import RequireAdmin from '@/components/RequireAdmin'
 import Login from '@/pages/Login'
-import Placeholder from '@/pages/Placeholder'
 import NotFound from '@/pages/NotFound'
 import UiKit from '@/pages/UiKit'
 import Profile from '@/pages/Profile'
@@ -16,6 +15,7 @@ import Bookings from '@/pages/Bookings'
 import BookingDetail from '@/pages/bookings/BookingDetail'
 import Dashboard from '@/pages/Dashboard'
 import Integrations from '@/pages/Integrations'
+import Search from '@/pages/Search'
 import Conversations from '@/pages/Conversations'
 import ConversationDetail from '@/pages/conversations/ConversationDetail'
 
@@ -43,7 +43,7 @@ function App() {
         <Route path="/integrations" element={<RequireAdmin><Integrations /></RequireAdmin>} />
         <Route path="/settings" element={<RequireAdmin><Settings /></RequireAdmin>} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/search" element={<Placeholder title="Search" feature={9} />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/ui-kit" element={<UiKit />} />
         <Route path="*" element={<NotFound />} />
       </Route>
