@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Plus, CalendarX, Bot, Hand } from 'lucide-react'
+import { Plus, CalendarX, Bot, Hand, X } from 'lucide-react'
 import DataList from '@/components/DataList'
 import Button from '@/components/Button'
 import SearchInput from '@/components/SearchInput'
@@ -30,13 +30,22 @@ export function SourceIcon({ source }) {
 
 export default function Bookings() {
   const navigate = useNavigate()
+  // Dashboard stat cards and notifications deep-link into this page.
+  const [searchParams] = useSearchParams()
 
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
-  const [status, setStatus] = useState('')
+  const [status, setStatus] = useState(() => searchParams.get('status') ?? '')
   const [serviceId, setServiceId] = useState('')
-  const [source, setSource] = useState('')
-  const [q, setQ] = useState('')
+  const [source, setSource] = useState(() => searchParams.get('source') ?? '')
+  const [q, setQ] = useState(() => searchParams.get('q') ?? '')
+  const [dateRange, setDateRange] = useState(() => {
+    const from = searchParams.get('from')
+    const to = searchParams.get('to')
+    return from || to
+      ? { from, to, label: searchParams.get('label') ?? 'Date range' }
+      : null
+  })
   const [creating, setCreating] = useState(false)
 
   const params = {
@@ -46,6 +55,8 @@ export default function Bookings() {
     service_id: serviceId || undefined,
     source: source || undefined,
     q: q || undefined,
+    from: dateRange?.from || undefined,
+    to: dateRange?.to || undefined,
   }
 
   const { data, isLoading, isFetching, refetch } = useQuery({
@@ -68,8 +79,8 @@ export default function Bookings() {
 
   return (
     <div className="space-y-3">
-      {/* Status filter chips */}
-      <div className="flex flex-wrap gap-2">
+      {/* Status filter chips + any date filter arrived at via deep link */}
+      <div className="flex flex-wrap items-center gap-2">
         {STATUSES.map((s) => (
           <button
             key={s || 'all'}
@@ -84,6 +95,17 @@ export default function Bookings() {
             {s || 'All'}
           </button>
         ))}
+
+        {dateRange && (
+          <button
+            type="button"
+            onClick={() => reset(setDateRange)(null)}
+            className="ml-auto flex min-h-9 items-center gap-1.5 rounded-full border border-accent bg-accent/10 px-3 text-sm font-medium text-accent"
+          >
+            {dateRange.label}
+            <X size={14} />
+          </button>
+        )}
       </div>
 
       <DataList

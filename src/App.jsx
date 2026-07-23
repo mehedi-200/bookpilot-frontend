@@ -14,6 +14,7 @@ import Customers from '@/pages/Customers'
 import CustomerDetail from '@/pages/customers/CustomerDetail'
 import Bookings from '@/pages/Bookings'
 import BookingDetail from '@/pages/bookings/BookingDetail'
+import Dashboard from '@/pages/Dashboard'
 
 function App() {
   return (
@@ -27,7 +28,7 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route path="/" element={<Placeholder title="Dashboard" feature={9} />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/bookings" element={<Bookings />} />
         <Route path="/bookings/:id" element={<BookingDetail />} />
         <Route path="/conversations" element={<Placeholder title="Conversations" feature={6} />} />

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Copy, Check, Eye, EyeOff, RefreshCw, Trash2, CalendarOff } from 'lucide-react'
@@ -17,7 +18,12 @@ const TABS = ['Business', 'Working hours', 'Widget']
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 export default function Settings() {
-  const [tab, setTab] = useState('Business')
+  // The dashboard onboarding checklist links straight to a tab.
+  const [searchParams] = useSearchParams()
+  const [tab, setTab] = useState(() => {
+    const requested = searchParams.get('tab')
+    return TABS.includes(requested) ? requested : 'Business'
+  })
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
