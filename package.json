@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run build:widget && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:widget": "vite build --config vite.widget.config.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
