@@ -8,7 +8,7 @@ export default function EmptyState({
   action,
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 px-6 py-14 text-center">
+    <div className="flex h-full flex-col items-center justify-center gap-2 px-6 py-10 text-center">
       <div className="flex size-12 items-center justify-center rounded-full bg-surface-2">
         <Icon size={22} className="text-ink-muted" />
       </div>

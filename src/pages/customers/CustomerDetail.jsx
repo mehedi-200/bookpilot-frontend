@@ -150,7 +150,7 @@ export default function CustomerDetail() {
         )}
       </Card>
 
-      <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
+      <div className="grid gap-3 lg:grid-cols-2">
         <Card title={`Bookings (${customer.bookings_count ?? 0})`}>
           {(customer.bookings ?? []).length === 0 ? (
             <EmptyState
