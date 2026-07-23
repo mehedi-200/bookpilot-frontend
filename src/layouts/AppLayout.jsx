@@ -11,7 +11,7 @@ import {
   Palette,
   Rocket,
 } from 'lucide-react'
-import { NAV_ITEMS, BOTTOM_NAV, MORE_ITEMS, PAGE_TITLES } from '@/layouts/nav'
+import { NAV_ITEMS, BOTTOM_NAV, MORE_ITEMS, getPageTitle } from '@/layouts/nav'
 import { useTheme } from '@/hooks/useTheme'
 import { useAuth } from '@/hooks/useAuth'
 import SearchInput from '@/components/SearchInput'
@@ -26,7 +26,7 @@ export default function AppLayout() {
   const [moreOpen, setMoreOpen] = useState(false)
   const location = useLocation()
   const { isAdmin } = useAuth()
-  const title = PAGE_TITLES[location.pathname] ?? 'BookPilot'
+  const title = getPageTitle(location.pathname)
 
   const canSee = (item) => !item.adminOnly || isAdmin
   const navItems = NAV_ITEMS.filter(canSee)

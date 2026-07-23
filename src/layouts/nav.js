@@ -39,3 +39,16 @@ export const PAGE_TITLES = {
   '/search': 'Search',
   '/ui-kit': 'UI Kit',
 }
+
+// Detail pages (dynamic segments) fall back by prefix.
+const PREFIX_TITLES = [
+  ['/customers/', 'Customer'],
+  ['/bookings/', 'Booking'],
+  ['/conversations/', 'Conversation'],
+]
+
+export function getPageTitle(pathname) {
+  if (PAGE_TITLES[pathname]) return PAGE_TITLES[pathname]
+  const prefixed = PREFIX_TITLES.find(([prefix]) => pathname.startsWith(prefix))
+  return prefixed ? prefixed[1] : 'BookPilot'
+}
