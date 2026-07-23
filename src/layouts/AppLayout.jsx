@@ -44,24 +44,28 @@ export default function AppLayout() {
   return (
     <div className="flex h-full flex-col bg-app">
       {/* ── Desktop thin header ── */}
+      {/* Equal-weight flanks keep the search optically centred whatever the
+          logo or right-hand controls grow to. */}
       <header className="hidden h-12 shrink-0 items-center gap-3 border-b border-line bg-surface px-3 lg:flex">
-        <IconButton label="Toggle sidebar" onClick={toggleSidebar}>
-          <Menu size={18} />
-        </IconButton>
-        <NavLink to="/" className="flex items-center gap-2">
-          <span className="flex size-6 items-center justify-center rounded-md bg-accent text-accent-contrast">
-            <Rocket size={14} />
-          </span>
-          <span className="text-sm font-semibold text-ink">BookPilot</span>
-        </NavLink>
+        <div className="flex flex-1 items-center gap-2">
+          <IconButton label="Toggle sidebar" onClick={toggleSidebar}>
+            <Menu size={18} />
+          </IconButton>
+          <NavLink to="/" className="flex items-center gap-2">
+            <span className="flex size-6 items-center justify-center rounded-md bg-accent text-accent-contrast">
+              <Rocket size={14} />
+            </span>
+            <span className="text-sm font-semibold text-ink">BookPilot</span>
+          </NavLink>
+        </div>
 
         <SearchInput
           placeholder="Search bookings, customers… ( / )"
-          className="ml-4 w-full max-w-md"
+          className="w-full max-w-md shrink-0"
           onChange={() => {}}
         />
 
-        <div className="ml-auto flex items-center gap-1">
+        <div className="flex flex-1 items-center justify-end gap-1">
           <NotificationBell />
           <ProfileMenu />
         </div>
