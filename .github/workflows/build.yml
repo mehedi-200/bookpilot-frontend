@@ -1,0 +1,39 @@
+name: build
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # `build` runs build:widget first, so this covers both bundles.
+      - name: Build dashboard and widget
+        run: npm run build
+
+      - name: Check the widget bundle stays small
+        run: |
+          SIZE=$(gzip -c public/widget.js | wc -c)
+          echo "widget.js: $SIZE bytes gzipped"
+          if [ "$SIZE" -gt 153600 ]; then
+            echo "::error::Widget bundle exceeds the 150 KB gzipped budget"
+            exit 1
+          fi
