@@ -28,6 +28,33 @@ export function friendlyDateTime(iso) {
   })}`
 }
 
+export function timeLabel(iso) {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleTimeString(undefined, {
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}
+
+/** Y-m-d in local time — what the availability API expects. */
+export function toDateParam(date) {
+  const d = new Date(date)
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}-${month}-${day}`
+}
+
+/** The next `count` days starting today, for the day strip. */
+export function upcomingDays(count = 14) {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return Array.from({ length: count }, (_, i) => {
+    const date = new Date(today)
+    date.setDate(today.getDate() + i)
+    return date
+  })
+}
+
 function startOfDay(d) {
   const copy = new Date(d)
   copy.setHours(0, 0, 0, 0)

@@ -12,6 +12,8 @@ import Services from '@/pages/Services'
 import Settings from '@/pages/Settings'
 import Customers from '@/pages/Customers'
 import CustomerDetail from '@/pages/customers/CustomerDetail'
+import Bookings from '@/pages/Bookings'
+import BookingDetail from '@/pages/bookings/BookingDetail'
 
 function App() {
   return (
@@ -26,7 +28,8 @@ function App() {
         }
       >
         <Route path="/" element={<Placeholder title="Dashboard" feature={9} />} />
-        <Route path="/bookings" element={<Placeholder title="Bookings" feature={5} />} />
+        <Route path="/bookings" element={<Bookings />} />
+        <Route path="/bookings/:id" element={<BookingDetail />} />
         <Route path="/conversations" element={<Placeholder title="Conversations" feature={6} />} />
         <Route path="/customers" element={<Customers />} />
         <Route path="/customers/:id" element={<CustomerDetail />} />
