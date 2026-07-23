@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>BookPilot</title>
+    <script>
+      // Apply the persisted theme before React mounts — prevents theme flash.
+      try {
+        var t = localStorage.getItem('bookpilot_theme')
+        var themes = ['dark', 'light', 'reading']
+        document.documentElement.classList.remove('dark', 'light', 'reading')
+        document.documentElement.classList.add(themes.indexOf(t) >= 0 ? t : 'dark')
+      } catch (e) {
+        document.documentElement.classList.add('dark')
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

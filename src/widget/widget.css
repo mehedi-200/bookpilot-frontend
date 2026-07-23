@@ -1,0 +1,394 @@
+/* Widget styles — injected into a shadow root, so nothing here leaks out and
+   nothing on the host page leaks in. Deliberately plain CSS (no Tailwind): the
+   bundle has to stay small and completely self-contained. */
+
+:host {
+  all: initial;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.bp {
+  --bp-accent: #6366f1;
+  --bp-accent-ink: #ffffff;
+  --bp-bg: #ffffff;
+  --bp-surface: #f4f5f8;
+  --bp-line: #e2e5ec;
+  --bp-ink: #1b2333;
+  --bp-ink-muted: #5d6675;
+  --bp-ok: #16a34a;
+  --bp-shadow: 0 12px 40px rgba(15, 20, 35, 0.18);
+
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2147483000; /* above almost anything a host page sets */
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--bp-ink);
+}
+
+/* The widget is a guest surface — it follows the visitor's OS preference. */
+@media (prefers-color-scheme: dark) {
+  .bp {
+    --bp-bg: #141a24;
+    --bp-surface: #1c2431;
+    --bp-line: #2b3546;
+    --bp-ink: #e7ebf3;
+    --bp-ink-muted: #97a1b5;
+    --bp-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* ── Launcher ─────────────────────────────────────────────────────────── */
+
+.bp-launcher {
+  width: 56px;
+  height: 56px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--bp-accent);
+  color: var(--bp-accent-ink);
+  box-shadow: var(--bp-shadow);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease;
+}
+
+.bp-launcher:hover {
+  transform: scale(1.05);
+}
+
+.bp-launcher-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #ef4444;
+  border: 2px solid var(--bp-bg);
+}
+
+/* ── Panel ────────────────────────────────────────────────────────────── */
+
+.bp-panel {
+  width: 380px;
+  height: 600px;
+  max-height: calc(100dvh - 40px);
+  background: var(--bp-bg);
+  border: 1px solid var(--bp-line);
+  border-radius: 16px;
+  box-shadow: var(--bp-shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: bp-in 0.15s ease-out;
+}
+
+@keyframes bp-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+@media (max-width: 480px) {
+  .bp {
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  .bp-panel {
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .bp-launcher {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+  }
+}
+
+.bp-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--bp-line);
+  background: var(--bp-bg);
+}
+
+.bp-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--bp-accent);
+  color: var(--bp-accent-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bp-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.bp-subtitle {
+  font-size: 12px;
+  color: var(--bp-ink-muted);
+}
+
+.bp-icon-btn {
+  margin-left: auto;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--bp-ink-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bp-icon-btn:hover {
+  background: var(--bp-surface);
+  color: var(--bp-ink);
+}
+
+/* ── Messages ─────────────────────────────────────────────────────────── */
+
+.bp-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bp-row {
+  display: flex;
+}
+
+.bp-row-user {
+  justify-content: flex-end;
+}
+
+.bp-bubble {
+  max-width: 80%;
+  padding: 9px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.bp-bubble-agent {
+  background: var(--bp-surface);
+  color: var(--bp-ink);
+  border-bottom-left-radius: 4px;
+}
+
+.bp-bubble-user {
+  background: var(--bp-accent);
+  color: var(--bp-accent-ink);
+  border-bottom-right-radius: 4px;
+}
+
+/* ── Chips ────────────────────────────────────────────────────────────── */
+
+.bp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bp-chip {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--bp-line);
+  border-radius: 999px;
+  background: var(--bp-bg);
+  color: var(--bp-ink);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.bp-chip:hover:not(:disabled) {
+  border-color: var(--bp-accent);
+  color: var(--bp-accent);
+}
+
+.bp-chip:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.bp-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bp-ink-muted);
+  margin-bottom: 4px;
+}
+
+.bp-group + .bp-group {
+  margin-top: 8px;
+}
+
+/* ── Booking confirmation card ────────────────────────────────────────── */
+
+.bp-card {
+  border: 1px solid var(--bp-line);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--bp-bg);
+  max-width: 85%;
+}
+
+.bp-card-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--bp-ok);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.bp-card-row {
+  font-size: 14px;
+}
+
+.bp-card-ref {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--bp-line);
+  font-size: 12px;
+  color: var(--bp-ink-muted);
+}
+
+.bp-card-ref strong {
+  color: var(--bp-ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ── Typing indicator ─────────────────────────────────────────────────── */
+
+.bp-typing {
+  display: flex;
+  gap: 4px;
+  padding: 12px;
+}
+
+.bp-typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--bp-ink-muted);
+  animation: bp-bounce 1.2s infinite;
+}
+
+.bp-typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.bp-typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes bp-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+/* ── Composer ─────────────────────────────────────────────────────────── */
+
+.bp-composer {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid var(--bp-line);
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.bp-input {
+  flex: 1;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--bp-line);
+  border-radius: 999px;
+  background: var(--bp-bg);
+  color: var(--bp-ink);
+  font-size: 16px; /* 16px stops iOS zooming on focus */
+  outline: none;
+}
+
+.bp-input:focus {
+  border-color: var(--bp-accent);
+}
+
+.bp-send {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--bp-accent);
+  color: var(--bp-accent-ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bp-send:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.bp-error {
+  font-size: 12px;
+  color: #ef4444;
+  padding: 0 14px 6px;
+}
+
+.bp-retry {
+  background: none;
+  border: 0;
+  color: var(--bp-accent);
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}

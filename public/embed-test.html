@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BookPilot widget — hostile host page</title>
+
+    <!--
+      This page is deliberately awful. If the widget survives here it will
+      survive on any real customer site. Run `npm run build:widget`, then open
+      http://localhost:5173/embed-test.html
+    -->
+    <style>
+      /* A stylesheet doing everything a badly built site might do */
+      * {
+        box-sizing: content-box !important;
+        font-family: 'Comic Sans MS', cursive !important;
+        letter-spacing: 3px;
+      }
+      body {
+        background: repeating-linear-gradient(45deg, #ffe4e1, #ffe4e1 20px, #e0ffff 20px, #e0ffff 40px);
+        font-size: 26px;
+        line-height: 3;
+        color: hotpink;
+        margin: 0;
+        padding: 40px;
+      }
+      div {
+        border: 3px dashed limegreen;
+        padding: 14px;
+      }
+      button {
+        background: yellow !important;
+        color: red !important;
+        border: 6px ridge purple !important;
+        border-radius: 0 !important;
+        font-size: 30px !important;
+        padding: 20px !important;
+        text-transform: uppercase !important;
+      }
+      input,
+      svg,
+      form,
+      span,
+      p {
+        all: revert;
+        border: 4px solid orange;
+        background: black;
+        color: lime;
+      }
+      :root {
+        --bp-accent: red; /* try to hijack the widget's own tokens */
+        --bp-bg: black;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Pretend customer website</h1>
+    <p>
+      Every element on this page is being styled aggressively — wrong box model,
+      Comic Sans, forced borders, hijacked CSS variables, <code>!important</code>
+      everywhere. The widget in the bottom-right corner should look exactly as it
+      does on a clean page.
+    </p>
+    <div>
+      <button>A host page button (this is what their CSS does)</button>
+    </div>
+    <p>Scroll down — the launcher stays pinned.</p>
+    <div style="height: 1200px">Filler to make the page scroll.</div>
+
+    <!-- The entire install: one line -->
+    <script
+      src="/widget.js"
+      data-widget-key="REPLACE_WITH_YOUR_WIDGET_KEY"
+      data-api-url="http://localhost:8000/api"
+      defer
+    ></script>
+  </body>
+</html>
