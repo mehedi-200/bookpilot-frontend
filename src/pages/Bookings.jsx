@@ -6,24 +6,56 @@ import DataList from '@/components/DataList'
 import Button from '@/components/Button'
 import SearchInput from '@/components/SearchInput'
 import StatusChip, { STATUS_TONES } from '@/components/StatusChip'
+import Avatar from '@/components/Avatar'
 import { Select } from '@/components/Field'
 import { bookingService } from '@/services/bookingService'
 import { catalogService } from '@/services/catalogService'
-import { friendlyDateTime } from '@/utils/dates'
+import { friendlyDate, timeLabel, isToday } from '@/utils/dates'
 import NewBookingModal from '@/pages/bookings/NewBookingModal'
 
-const STATUSES = ['', 'pending', 'confirmed', 'completed', 'cancelled']
+const STATUSES = [
+  ['', 'All'],
+  ['pending', 'Pending'],
+  ['confirmed', 'Confirmed'],
+  ['completed', 'Completed'],
+  ['cancelled', 'Cancelled'],
+]
 
-export function SourceIcon({ source }) {
+export function SourceIcon({ source, withLabel = true }) {
   const isAi = source === 'widget'
   const Icon = isAi ? Bot : Hand
   return (
     <span
-      title={isAi ? 'Booked by AI' : 'Added manually'}
-      className={`inline-flex items-center gap-1 text-xs ${isAi ? 'text-accent' : 'text-ink-muted'}`}
+      title={isAi ? 'Booked by the AI' : 'Added manually'}
+      className={`inline-flex items-center gap-1.5 text-xs ${isAi ? 'text-accent' : 'text-ink-muted'}`}
     >
       <Icon size={15} />
-      {isAi ? 'AI' : 'Manual'}
+      {withLabel && (isAi ? 'AI' : 'Manual')}
+    </span>
+  )
+}
+
+/** Day on top, time beneath — the pair reads as one thing at a glance. */
+function When({ startsAt, status }) {
+  const today = isToday(startsAt)
+  const done = status === 'completed' || status === 'cancelled'
+
+  return (
+    <span className="block whitespace-nowrap">
+      <span
+        className={`block text-sm ${
+          today
+            ? 'font-semibold text-accent'
+            : done
+              ? 'text-ink-muted'
+              : 'font-medium text-ink'
+        }`}
+      >
+        {friendlyDate(startsAt)}
+      </span>
+      <span className="block text-xs text-ink-muted tabular-nums">
+        {timeLabel(startsAt)}
+      </span>
     </span>
   )
 }
@@ -75,74 +107,52 @@ export default function Bookings() {
     setPage(1)
   }
 
-  const rows = data?.data ?? []
+  const filtered = !!(status || q || source || serviceId || dateRange)
 
   return (
-    <div className="space-y-3">
-      {/* Status filter chips + any date filter arrived at via deep link */}
-      <div className="flex flex-wrap items-center gap-2">
-        {STATUSES.map((s) => (
-          <button
-            key={s || 'all'}
-            type="button"
-            onClick={() => reset(setStatus)(s)}
-            className={`min-h-9 rounded-full border px-3 text-sm font-medium capitalize transition-colors ${
-              status === s
-                ? 'border-accent bg-accent text-accent-contrast'
-                : 'border-line text-ink-muted hover:text-ink'
-            }`}
-          >
-            {s || 'All'}
-          </button>
-        ))}
-
-        {dateRange && (
-          <button
-            type="button"
-            onClick={() => reset(setDateRange)(null)}
-            className="ml-auto flex min-h-9 items-center gap-1.5 rounded-full border border-accent bg-accent/10 px-3 text-sm font-medium text-accent"
-          >
-            {dateRange.label}
-            <X size={14} />
-          </button>
-        )}
-      </div>
-
+    <>
       <DataList
         columns={[
           {
-            key: 'reference',
-            header: 'Ref',
-            className: 'font-medium whitespace-nowrap',
+            key: 'customer',
+            header: 'Customer',
             render: (b) => (
-              <span className="flex items-center gap-1.5">
-                {b.reference}
-                {b.sync_status === 'failed' && (
-                  <AlertTriangle
-                    size={13}
-                    className="text-danger"
-                    title="Failed to sync to GarageFlow"
-                  />
-                )}
+              <span className="flex items-center gap-2.5">
+                <Avatar name={b.customer?.name} />
+                <span className="min-w-0">
+                  <span className="flex items-center gap-1.5 truncate font-medium text-ink">
+                    {b.customer?.name ?? '—'}
+                    {b.sync_status === 'failed' && (
+                      <AlertTriangle
+                        size={12}
+                        className="shrink-0 text-danger"
+                        title="Failed to sync to GarageFlow"
+                      />
+                    )}
+                  </span>
+                  <span className="block truncate text-xs text-ink-muted tabular-nums">
+                    {b.reference}
+                  </span>
+                </span>
               </span>
             ),
           },
           {
-            key: 'customer',
-            header: 'Customer',
-            render: (b) => b.customer?.name ?? '—',
-          },
-          {
             key: 'service',
             header: 'Service',
-            className: 'text-ink-muted',
-            render: (b) => b.service?.name ?? '—',
+            render: (b) => (
+              <span className="block">
+                <span className="block text-ink">{b.service?.name ?? '—'}</span>
+                <span className="block text-xs text-ink-muted">
+                  {b.service?.duration_minutes} min
+                </span>
+              </span>
+            ),
           },
           {
             key: 'starts_at',
             header: 'When',
-            className: 'whitespace-nowrap',
-            render: (b) => friendlyDateTime(b.starts_at),
+            render: (b) => <When startsAt={b.starts_at} status={b.status} />,
           },
           {
             key: 'source',
@@ -152,26 +162,46 @@ export default function Bookings() {
           {
             key: 'status',
             header: 'Status',
+            className: 'text-right',
             render: (b) => (
               <StatusChip tone={STATUS_TONES[b.status]}>{b.status}</StatusChip>
             ),
           },
         ]}
-        rows={rows}
+        rows={data?.data ?? []}
         loading={isLoading}
         onRowClick={(b) => navigate(`/bookings/${b.id}`)}
         renderCard={(b) => (
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-sm font-medium text-ink">{b.customer?.name ?? '—'}</p>
-              <StatusChip tone={STATUS_TONES[b.status]}>{b.status}</StatusChip>
-            </div>
-            <p className="text-xs text-ink-muted">
-              {b.reference} · {b.service?.name}
-            </p>
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-sm text-ink">{friendlyDateTime(b.starts_at)}</p>
-              <SourceIcon source={b.source} />
+          <div className="flex items-start gap-3">
+            <Avatar name={b.customer?.name} size="size-9" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-2">
+                <p className="truncate text-sm font-medium text-ink">
+                  {b.customer?.name ?? '—'}
+                </p>
+                <StatusChip tone={STATUS_TONES[b.status]}>
+                  {b.status}
+                </StatusChip>
+              </div>
+              <p className="truncate text-xs text-ink-muted">
+                {b.reference} · {b.service?.name}
+              </p>
+              <div className="mt-1.5 flex items-center justify-between gap-2">
+                <span
+                  className={`text-sm ${
+                    isToday(b.starts_at)
+                      ? 'font-semibold text-accent'
+                      : 'text-ink'
+                  }`}
+                >
+                  {friendlyDate(b.starts_at)}
+                  <span className="text-ink-muted">
+                    {' '}
+                    · {timeLabel(b.starts_at)}
+                  </span>
+                </span>
+                <SourceIcon source={b.source} withLabel={false} />
+              </div>
             </div>
           </div>
         )}
@@ -180,12 +210,42 @@ export default function Bookings() {
             <Button onClick={() => setCreating(true)}>
               <Plus size={16} /> New booking
             </Button>
+
+            {/* Attached to the table, never floating above it */}
+            <div className="-mx-1 flex max-w-full gap-1 overflow-x-auto px-1">
+              {STATUSES.map(([value, label]) => (
+                <button
+                  key={value || 'all'}
+                  type="button"
+                  onClick={() => reset(setStatus)(value)}
+                  className={`min-h-9 shrink-0 rounded-lg px-2.5 text-sm font-medium transition-colors ${
+                    status === value
+                      ? 'bg-accent text-accent-contrast'
+                      : 'text-ink-muted hover:bg-surface-2 hover:text-ink'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {dateRange && (
+              <button
+                type="button"
+                onClick={() => reset(setDateRange)(null)}
+                className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-accent px-2.5 text-sm font-medium text-accent"
+              >
+                {dateRange.label}
+                <X size={14} />
+              </button>
+            )}
+
             <div className="flex w-full flex-wrap items-center gap-2 md:ml-auto md:w-auto">
               <Select
                 aria-label="Filter by service"
                 value={serviceId}
                 onChange={(e) => reset(setServiceId)(e.target.value)}
-                className="w-40"
+                className="w-36"
               >
                 <option value="">All services</option>
                 {(services?.data ?? []).map((s) => (
@@ -198,14 +258,14 @@ export default function Bookings() {
                 aria-label="Filter by source"
                 value={source}
                 onChange={(e) => reset(setSource)(e.target.value)}
-                className="w-32"
+                className="w-28"
               >
                 <option value="">Any source</option>
                 <option value="widget">AI</option>
                 <option value="manual">Manual</option>
               </Select>
               <SearchInput
-                className="w-full md:w-56"
+                className="w-full md:w-52"
                 placeholder="Ref, name or phone…"
                 value={q}
                 onChange={reset(setQ)}
@@ -215,18 +275,16 @@ export default function Bookings() {
         }
         empty={{
           icon: CalendarX,
-          title: status
-            ? `No ${status} bookings`
-            : q
-              ? `No bookings matching “${q}”`
-              : 'No bookings yet',
-          hint:
+          title:
             status === 'pending'
-              ? 'Nothing waiting on you right now 🎉'
-              : status || q
-                ? undefined
-                : 'They appear here as soon as the AI books one — or add one yourself.',
-          action: !status && !q && (
+              ? 'Nothing waiting on you'
+              : filtered
+                ? 'No bookings match these filters'
+                : 'No bookings yet',
+          hint: filtered
+            ? 'Try clearing a filter or searching for a phone number.'
+            : 'They appear here as soon as the AI books one — or add one yourself.',
+          action: !filtered && (
             <Button onClick={() => setCreating(true)}>
               <Plus size={16} /> New booking
             </Button>
@@ -252,6 +310,6 @@ export default function Bookings() {
           navigate(`/bookings/${booking.id}`)
         }}
       />
-    </div>
+    </>
   )
 }

@@ -76,7 +76,9 @@ export default function Conversations() {
                 <span>
                   {c.contact_name}
                   {c.phone && (
-                    <span className="block text-xs font-normal text-ink-muted">{c.phone}</span>
+                    <span className="block text-xs font-normal text-ink-muted">
+                      {c.phone}
+                    </span>
                   )}
                 </span>
               </span>
@@ -132,7 +134,9 @@ export default function Conversations() {
                 {c.status === 'handed_off' ? 'needs a human' : c.status}
               </StatusChip>
             </div>
-            <p className="truncate text-xs text-ink-muted">{c.preview ?? '—'}</p>
+            <p className="truncate text-xs text-ink-muted">
+              {c.preview ?? '—'}
+            </p>
             <p className="text-xs text-ink-muted">
               {friendlyDateTime(c.last_activity_at ?? c.started_at)}
               {c.bookings_count > 0 && ` · ${c.bookings_count} booked`}

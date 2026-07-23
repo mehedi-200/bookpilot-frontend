@@ -7,8 +7,18 @@ import Spinner from '@/components/Spinner'
 import { searchService } from '@/services/searchService'
 
 const GROUPS = [
-  { key: 'bookings', label: 'Bookings', icon: CalendarCheck, path: (r) => `/bookings/${r.id}` },
-  { key: 'customers', label: 'Customers', icon: Users, path: (r) => `/customers/${r.id}` },
+  {
+    key: 'bookings',
+    label: 'Bookings',
+    icon: CalendarCheck,
+    path: (r) => `/bookings/${r.id}`,
+  },
+  {
+    key: 'customers',
+    label: 'Customers',
+    icon: Users,
+    path: (r) => `/customers/${r.id}`,
+  },
   {
     key: 'conversations',
     label: 'Conversations',
@@ -49,7 +59,8 @@ export default function MasterSearch() {
 
   useEffect(() => {
     const onClickAway = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) setOpen(false)
+      if (containerRef.current && !containerRef.current.contains(event.target))
+        setOpen(false)
     }
     document.addEventListener('mousedown', onClickAway)
     return () => document.removeEventListener('mousedown', onClickAway)
@@ -162,7 +173,10 @@ export default function MasterSearch() {
                               index === active ? 'bg-surface-2' : ''
                             }`}
                           >
-                            <Icon size={15} className="shrink-0 text-ink-muted" />
+                            <Icon
+                              size={15}
+                              className="shrink-0 text-ink-muted"
+                            />
                             <span className="min-w-0 flex-1">
                               <span className="block truncate text-sm text-ink">
                                 {row.title}
@@ -174,7 +188,9 @@ export default function MasterSearch() {
                             </span>
                             {row.status && (
                               <StatusChip tone={STATUS_TONES[row.status]}>
-                                {row.status === 'handed_off' ? 'needs a human' : row.status}
+                                {row.status === 'handed_off'
+                                  ? 'needs a human'
+                                  : row.status}
                               </StatusChip>
                             )}
                           </button>

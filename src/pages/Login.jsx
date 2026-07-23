@@ -12,7 +12,9 @@ export default function Login() {
   const [params] = useSearchParams()
   const { login } = useAuth()
 
-  const [email, setEmail] = useState(() => localStorage.getItem(EMAIL_KEY) ?? '')
+  const [email, setEmail] = useState(
+    () => localStorage.getItem(EMAIL_KEY) ?? ''
+  )
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
@@ -48,7 +50,9 @@ export default function Login() {
             <Rocket size={22} />
           </span>
           <h1 className="text-lg font-semibold text-ink">BookPilot</h1>
-          <p className="text-sm text-ink-muted">Welcome back — sign in to continue</p>
+          <p className="text-sm text-ink-muted">
+            Welcome back — sign in to continue
+          </p>
         </div>
 
         {error && (

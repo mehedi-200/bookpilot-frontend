@@ -31,7 +31,11 @@ export default function SlotPicker({ serviceId, value, onChange }) {
   }
 
   if (!serviceId) {
-    return <p className="text-sm text-ink-muted">Pick a service to see available times.</p>
+    return (
+      <p className="text-sm text-ink-muted">
+        Pick a service to see available times.
+      </p>
+    )
   }
 
   return (
@@ -52,7 +56,9 @@ export default function SlotPicker({ serviceId, value, onChange }) {
                   : 'border-line text-ink-muted hover:text-ink'
               }`}
             >
-              <span>{day.toLocaleDateString(undefined, { weekday: 'short' })}</span>
+              <span>
+                {day.toLocaleDateString(undefined, { weekday: 'short' })}
+              </span>
               <span className="text-base font-semibold">{day.getDate()}</span>
             </button>
           )

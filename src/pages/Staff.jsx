@@ -33,14 +33,17 @@ export default function Staff() {
     placeholderData: (prev) => prev,
   })
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['users'] })
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: ['users'] })
 
   const toggleMutation = useMutation({
     mutationFn: (user) => userService.toggleActive(user.id),
     onSuccess: (updated) => {
       invalidate()
       setDeactivating(null)
-      toast.success(updated.active ? 'Account activated' : 'Account deactivated')
+      toast.success(
+        updated.active ? 'Account activated' : 'Account deactivated'
+      )
     },
     onError: () => toast.error('Could not update the account'),
   })
@@ -94,7 +97,18 @@ export default function Staff() {
             key: 'actions',
             header: '',
             className: 'w-24',
-            render: (u) => <RowActions user={u} me={me} onEdit={setEditing} onToggle={(target) => (target.active ? setDeactivating(target) : toggleMutation.mutate(target))} />,
+            render: (u) => (
+              <RowActions
+                user={u}
+                me={me}
+                onEdit={setEditing}
+                onToggle={(target) =>
+                  target.active
+                    ? setDeactivating(target)
+                    : toggleMutation.mutate(target)
+                }
+              />
+            ),
           },
         ]}
         rows={rows}
@@ -105,13 +119,26 @@ export default function Staff() {
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-ink">
                 {u.name}{' '}
-                {u.id === me?.id && <span className="text-xs text-ink-muted">(you)</span>}
+                {u.id === me?.id && (
+                  <span className="text-xs text-ink-muted">(you)</span>
+                )}
               </p>
               <p className="truncate text-xs text-ink-muted">{u.email}</p>
             </div>
-            <StatusChip tone={u.role === 'admin' ? 'accent' : 'neutral'}>{u.role}</StatusChip>
+            <StatusChip tone={u.role === 'admin' ? 'accent' : 'neutral'}>
+              {u.role}
+            </StatusChip>
             {!u.active && <StatusChip tone="danger">inactive</StatusChip>}
-            <RowActions user={u} me={me} onEdit={setEditing} onToggle={(target) => (target.active ? setDeactivating(target) : toggleMutation.mutate(target))} />
+            <RowActions
+              user={u}
+              me={me}
+              onEdit={setEditing}
+              onToggle={(target) =>
+                target.active
+                  ? setDeactivating(target)
+                  : toggleMutation.mutate(target)
+              }
+            />
           </div>
         )}
         toolbar={
@@ -133,7 +160,9 @@ export default function Staff() {
         empty={{
           icon: UsersRound,
           title: q ? `No staff matching “${q}”` : 'No staff accounts yet',
-          hint: q ? undefined : 'Add your team so they can manage bookings with you.',
+          hint: q
+            ? undefined
+            : 'Add your team so they can manage bookings with you.',
           action: !q && (
             <Button onClick={() => setEditing('new')}>
               <Plus size={16} /> Add staff
@@ -178,7 +207,10 @@ export default function Staff() {
 
 function RowActions({ user, me, onEdit, onToggle }) {
   return (
-    <span className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+    <span
+      className="flex items-center justify-end gap-1"
+      onClick={(e) => e.stopPropagation()}
+    >
       <IconButton label="Edit" onClick={() => onEdit(user)}>
         <Pencil size={15} />
       </IconButton>
@@ -211,13 +243,20 @@ function UserFormModal({ editing, onClose, onSaved }) {
   } = useForm({
     defaultValues: isNew
       ? { name: '', email: '', password: '', role: 'staff' }
-      : { name: editing?.name, email: editing?.email, password: '', role: editing?.role },
+      : {
+          name: editing?.name,
+          email: editing?.email,
+          password: '',
+          role: editing?.role,
+        },
   })
 
   const mutation = useMutation({
     mutationFn: (data) => {
       if (!data.password) delete data.password
-      return isNew ? userService.create(data) : userService.update(editing.id, data)
+      return isNew
+        ? userService.create(data)
+        : userService.update(editing.id, data)
     },
     onSuccess: () => {
       toast.success(isNew ? 'Staff member added' : 'Staff member updated')
@@ -238,13 +277,19 @@ function UserFormModal({ editing, onClose, onSaved }) {
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>
-          <Button loading={mutation.isPending} onClick={handleSubmit((d) => mutation.mutate(d))}>
+          <Button
+            loading={mutation.isPending}
+            onClick={handleSubmit((d) => mutation.mutate(d))}
+          >
             {isNew ? 'Add staff' : 'Save changes'}
           </Button>
         </>
       }
     >
-      <form className="space-y-4" onSubmit={handleSubmit((d) => mutation.mutate(d))}>
+      <form
+        className="space-y-3"
+        onSubmit={handleSubmit((d) => mutation.mutate(d))}
+      >
         <Input
           label="Name"
           error={errors.name?.message}

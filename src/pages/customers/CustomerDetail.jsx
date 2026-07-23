@@ -1,7 +1,14 @@
 import { useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Phone, Mail, Pencil, Trash2, CalendarCheck, MessageSquare } from 'lucide-react'
+import {
+  Phone,
+  Mail,
+  Pencil,
+  Trash2,
+  CalendarCheck,
+  MessageSquare,
+} from 'lucide-react'
 import Card from '@/components/Card'
 import { IconButton } from '@/components/Button'
 import PageHeader from '@/components/PageHeader'
@@ -43,10 +50,12 @@ export default function CustomerDetail() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-3xl space-y-4">
+      <div className="space-y-3">
         <Skeleton className="h-9 w-48" />
-        <Skeleton className="h-36 w-full rounded-xl" />
-        <Skeleton className="h-48 w-full rounded-xl" />
+        <div className="grid gap-3 lg:grid-cols-3">
+          <Skeleton className="h-56 w-full rounded-xl" />
+          <Skeleton className="h-56 w-full rounded-xl lg:col-span-2" />
+        </div>
       </div>
     )
   }
@@ -54,7 +63,7 @@ export default function CustomerDetail() {
   if (!customer) return null
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4">
+    <div className="space-y-3">
       <PageHeader
         title={customer.name}
         backTo="/customers"
@@ -72,93 +81,117 @@ export default function CustomerDetail() {
         }
       />
 
-      <Card>
-        <div className="flex items-start gap-4">
-          <Avatar name={customer.name} size="size-12" />
-          <div className="min-w-0 flex-1 space-y-1.5">
-            <p className="text-base font-semibold text-ink">{customer.name}</p>
-            <p className="flex items-center gap-2 text-sm text-ink-muted">
-              <Phone size={14} />
-              <a href={`tel:${customer.phone}`} className="text-accent hover:underline">
-                {customer.phone}
-              </a>
-            </p>
-            {customer.email && (
+      <div className="grid gap-3 lg:grid-cols-3 lg:items-start">
+        <Card>
+          <div className="flex items-start gap-4">
+            <Avatar name={customer.name} size="size-12" />
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <p className="text-base font-semibold text-ink">
+                {customer.name}
+              </p>
               <p className="flex items-center gap-2 text-sm text-ink-muted">
-                <Mail size={14} />
-                <a href={`mailto:${customer.email}`} className="hover:underline">
-                  {customer.email}
+                <Phone size={14} />
+                <a
+                  href={`tel:${customer.phone}`}
+                  className="text-accent hover:underline"
+                >
+                  {customer.phone}
                 </a>
               </p>
-            )}
-            {customer.notes && (
-              <p className="rounded-lg bg-surface-2 p-2.5 text-sm text-ink">{customer.notes}</p>
-            )}
+              {customer.email && (
+                <p className="flex items-center gap-2 text-sm text-ink-muted">
+                  <Mail size={14} />
+                  <a
+                    href={`mailto:${customer.email}`}
+                    className="hover:underline"
+                  >
+                    {customer.email}
+                  </a>
+                </p>
+              )}
+              {customer.notes && (
+                <p className="rounded-lg bg-surface-2 p-2.5 text-sm text-ink">
+                  {customer.notes}
+                </p>
+              )}
+            </div>
           </div>
+        </Card>
+
+        <div className="space-y-3 lg:col-span-2">
+          <Card title={`Bookings (${customer.bookings_count ?? 0})`}>
+            {(customer.bookings ?? []).length === 0 ? (
+              <EmptyState
+                icon={CalendarCheck}
+                title="No bookings yet"
+                hint="Bookings made for this customer will appear here."
+              />
+            ) : (
+              <ul className="divide-y divide-line">
+                {customer.bookings.map((booking) => (
+                  <li key={booking.id}>
+                    <Link
+                      to={`/bookings/${booking.id}`}
+                      className="flex items-center gap-3 py-2.5 transition-colors hover:bg-surface-2"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm text-ink">
+                          {booking.service?.name}
+                        </p>
+                        <p className="text-xs text-ink-muted">
+                          {booking.reference} ·{' '}
+                          {friendlyDateTime(booking.starts_at)}
+                        </p>
+                      </div>
+                      <StatusChip tone={STATUS_TONES[booking.status]}>
+                        {booking.status}
+                      </StatusChip>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+
+          <Card title="Conversations">
+            {(customer.conversations ?? []).length === 0 ? (
+              <EmptyState
+                icon={MessageSquare}
+                title="No conversations yet"
+                hint="Chats with the AI assistant will appear here."
+              />
+            ) : (
+              <ul className="divide-y divide-line">
+                {customer.conversations.map((conversation) => (
+                  <li key={conversation.id}>
+                    <Link
+                      to={`/conversations/${conversation.id}`}
+                      className="flex items-center gap-3 py-2.5 transition-colors hover:bg-surface-2"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm text-ink">
+                          {conversation.preview ?? 'Conversation'}
+                        </p>
+                        <p className="text-xs text-ink-muted">
+                          {friendlyDateTime(
+                            conversation.last_activity_at ??
+                              conversation.started_at
+                          )}
+                        </p>
+                      </div>
+                      <StatusChip tone={STATUS_TONES[conversation.status]}>
+                        {conversation.status === 'handed_off'
+                          ? 'needs a human'
+                          : conversation.status}
+                      </StatusChip>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
         </div>
-      </Card>
-
-      <Card title={`Bookings (${customer.bookings_count ?? 0})`}>
-        {(customer.bookings ?? []).length === 0 ? (
-          <EmptyState
-            icon={CalendarCheck}
-            title="No bookings yet"
-            hint="Bookings made for this customer will appear here."
-          />
-        ) : (
-          <ul className="divide-y divide-line">
-            {customer.bookings.map((booking) => (
-              <li key={booking.id}>
-                <Link
-                  to={`/bookings/${booking.id}`}
-                  className="flex items-center gap-3 py-2.5 transition-colors hover:bg-surface-2"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm text-ink">{booking.service?.name}</p>
-                    <p className="text-xs text-ink-muted">
-                      {booking.reference} · {friendlyDateTime(booking.starts_at)}
-                    </p>
-                  </div>
-                  <StatusChip tone={STATUS_TONES[booking.status]}>{booking.status}</StatusChip>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
-
-      <Card title="Conversations">
-        {(customer.conversations ?? []).length === 0 ? (
-          <EmptyState
-            icon={MessageSquare}
-            title="No conversations yet"
-            hint="Chats with the AI assistant will appear here."
-          />
-        ) : (
-          <ul className="divide-y divide-line">
-            {customer.conversations.map((conversation) => (
-              <li key={conversation.id}>
-                <Link
-                  to={`/conversations/${conversation.id}`}
-                  className="flex items-center gap-3 py-2.5 transition-colors hover:bg-surface-2"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm text-ink">
-                      {conversation.preview ?? 'Conversation'}
-                    </p>
-                    <p className="text-xs text-ink-muted">
-                      {friendlyDateTime(conversation.last_activity_at ?? conversation.started_at)}
-                    </p>
-                  </div>
-                  <StatusChip tone={STATUS_TONES[conversation.status]}>
-                    {conversation.status === 'handed_off' ? 'needs a human' : conversation.status}
-                  </StatusChip>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+      </div>
 
       <CustomerFormModal
         open={editing}

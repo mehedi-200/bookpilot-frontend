@@ -36,7 +36,8 @@ export default function NotificationBell() {
 
   useEffect(() => {
     const onClickAway = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) setOpen(false)
+      if (containerRef.current && !containerRef.current.contains(event.target))
+        setOpen(false)
     }
     document.addEventListener('mousedown', onClickAway)
     return () => document.removeEventListener('mousedown', onClickAway)
@@ -78,7 +79,11 @@ export default function NotificationBell() {
               <CheckCheck size={13} /> Mark all read
             </button>
           )}
-          <IconButton label="Close" className="lg:hidden" onClick={() => setOpen(false)}>
+          <IconButton
+            label="Close"
+            className="lg:hidden"
+            onClick={() => setOpen(false)}
+          >
             <X size={18} />
           </IconButton>
         </div>
@@ -116,7 +121,9 @@ export default function NotificationBell() {
                       {notification.title}
                     </span>
                     {notification.body && (
-                      <span className="block text-sm text-ink-muted">{notification.body}</span>
+                      <span className="block text-sm text-ink-muted">
+                        {notification.body}
+                      </span>
                     )}
                     <span className="mt-0.5 block text-xs text-ink-muted">
                       {friendlyDateTime(notification.created_at)}

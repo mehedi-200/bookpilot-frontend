@@ -33,7 +33,7 @@ export default function Dashboard() {
   })
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <Greeting name={user?.name} />
 
       {!isLoading && data && (
@@ -97,7 +97,8 @@ export default function Dashboard() {
 
 function Greeting({ name }) {
   const hour = new Date().getHours()
-  const part = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+  const part =
+    hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
   const date = new Date().toLocaleDateString(undefined, {
     weekday: 'long',
     day: 'numeric',
@@ -179,8 +180,16 @@ function NeedsAttention({ needs }) {
 }
 
 const SETUP_STEPS = [
-  { key: 'business_configured', label: 'Business details', to: '/settings?tab=Business' },
-  { key: 'hours_set', label: 'Working hours', to: '/settings?tab=Working hours' },
+  {
+    key: 'business_configured',
+    label: 'Business details',
+    to: '/settings?tab=Business',
+  },
+  {
+    key: 'hours_set',
+    label: 'Working hours',
+    to: '/settings?tab=Working hours',
+  },
   { key: 'has_services', label: 'Services', to: '/services' },
   { key: 'widget_embedded', label: 'Embed widget', to: '/settings?tab=Widget' },
 ]
@@ -364,7 +373,9 @@ function TodaySchedule({ bookings, loading }) {
                 ) : (
                   <Hand size={15} className="shrink-0 text-ink-muted" />
                 )}
-                <StatusChip tone={STATUS_TONES[booking.status]}>{booking.status}</StatusChip>
+                <StatusChip tone={STATUS_TONES[booking.status]}>
+                  {booking.status}
+                </StatusChip>
               </button>
             </li>
           ))}
@@ -386,8 +397,8 @@ function AiPerformance({ share, loading }) {
     <Card title="AI performance" description="Last 30 days">
       {total === 0 ? (
         <p className="text-sm text-ink-muted">
-          Once your widget is live, this shows how much of the booking work the AI
-          handles for you.
+          Once your widget is live, this shows how much of the booking work the
+          AI handles for you.
         </p>
       ) : (
         <>
@@ -406,8 +417,18 @@ function AiPerformance({ share, loading }) {
           </div>
 
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <MiniStat icon={Bot} label="By AI" value={share.ai} tone="var(--accent)" />
-            <MiniStat icon={Hand} label="Manual" value={share.manual} tone="var(--ink-muted)" />
+            <MiniStat
+              icon={Bot}
+              label="By AI"
+              value={share.ai}
+              tone="var(--accent)"
+            />
+            <MiniStat
+              icon={Hand}
+              label="Manual"
+              value={share.manual}
+              tone="var(--ink-muted)"
+            />
           </div>
         </>
       )}

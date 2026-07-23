@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { CalendarCheck, Users, MessageSquare, SearchX, Clock } from 'lucide-react'
+import {
+  CalendarCheck,
+  Users,
+  MessageSquare,
+  SearchX,
+  Clock,
+} from 'lucide-react'
 import Card from '@/components/Card'
 import SearchInput from '@/components/SearchInput'
 import EmptyState from '@/components/EmptyState'
@@ -12,8 +18,18 @@ import { searchService } from '@/services/searchService'
 const RECENT_KEY = 'bookpilot_recent_searches'
 
 const GROUPS = [
-  { key: 'bookings', label: 'Bookings', icon: CalendarCheck, path: (r) => `/bookings/${r.id}` },
-  { key: 'customers', label: 'Customers', icon: Users, path: (r) => `/customers/${r.id}` },
+  {
+    key: 'bookings',
+    label: 'Bookings',
+    icon: CalendarCheck,
+    path: (r) => `/bookings/${r.id}`,
+  },
+  {
+    key: 'customers',
+    label: 'Customers',
+    icon: Users,
+    path: (r) => `/customers/${r.id}`,
+  },
   {
     key: 'conversations',
     label: 'Conversations',
@@ -44,7 +60,10 @@ export default function Search() {
   useEffect(() => {
     if (!data || data.total === 0 || term.trim().length < 2) return
     setRecent((current) => {
-      const next = [term.trim(), ...current.filter((r) => r !== term.trim())].slice(0, 6)
+      const next = [
+        term.trim(),
+        ...current.filter((r) => r !== term.trim()),
+      ].slice(0, 6)
       try {
         localStorage.setItem(RECENT_KEY, JSON.stringify(next))
       } catch {
@@ -130,7 +149,9 @@ export default function Search() {
                     >
                       <Icon size={16} className="shrink-0 text-ink-muted" />
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm text-ink">{row.title}</span>
+                        <span className="block truncate text-sm text-ink">
+                          {row.title}
+                        </span>
                         <span className="block truncate text-xs text-ink-muted">
                           {row.reference ? `${row.reference} · ` : ''}
                           {row.subtitle}
@@ -138,7 +159,9 @@ export default function Search() {
                       </span>
                       {row.status && (
                         <StatusChip tone={STATUS_TONES[row.status]}>
-                          {row.status === 'handed_off' ? 'needs a human' : row.status}
+                          {row.status === 'handed_off'
+                            ? 'needs a human'
+                            : row.status}
                         </StatusChip>
                       )}
                     </button>
