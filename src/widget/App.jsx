@@ -36,7 +36,9 @@ export default function App({ api }) {
             : [{ id: 'greeting', role: 'agent', text: data.greeting }]
         )
       })
-      .catch(() => setBoot({ business: { name: 'Bookings' }, quick_starts: [] }))
+      .catch(() =>
+        setBoot({ business: { name: 'Bookings' }, quick_starts: [] })
+      )
   }, [open, boot, api])
 
   useEffect(() => {
@@ -47,7 +49,10 @@ export default function App({ api }) {
   }, [open, messages.length])
 
   useEffect(() => {
-    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
+    listRef.current?.scrollTo({
+      top: listRef.current.scrollHeight,
+      behavior: 'smooth',
+    })
   }, [messages, sending])
 
   const send = useCallback(
@@ -126,7 +131,11 @@ export default function App({ api }) {
       )}
 
       {open && (
-        <div className="bp-panel" role="dialog" aria-label={`Chat with ${businessName}`}>
+        <div
+          className="bp-panel"
+          role="dialog"
+          aria-label={`Chat with ${businessName}`}
+        >
           <div className="bp-header">
             <span className="bp-avatar">
               <SparkIcon />
@@ -147,28 +156,38 @@ export default function App({ api }) {
 
           <div className="bp-messages" ref={listRef}>
             {messages.map((message) => (
-              <Message key={message.id} message={message} onPick={send} disabled={sending} />
+              <Message
+                key={message.id}
+                message={message}
+                onPick={send}
+                disabled={sending}
+              />
             ))}
 
             {/* Quick starts save the visitor composing a first message. */}
-            {messages.length <= 1 && boot?.quick_starts?.length > 0 && !sending && (
-              <div className="bp-chips">
-                {boot.quick_starts.map((label) => (
-                  <button
-                    key={label}
-                    type="button"
-                    className="bp-chip"
-                    onClick={() => send(label)}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            )}
+            {messages.length <= 1 &&
+              boot?.quick_starts?.length > 0 &&
+              !sending && (
+                <div className="bp-chips">
+                  {boot.quick_starts.map((label) => (
+                    <button
+                      key={label}
+                      type="button"
+                      className="bp-chip"
+                      onClick={() => send(label)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
 
             {sending && (
               <div className="bp-row">
-                <div className="bp-bubble bp-bubble-agent bp-typing" aria-label="Assistant is typing">
+                <div
+                  className="bp-bubble bp-bubble-agent bp-typing"
+                  aria-label="Assistant is typing"
+                >
                   <span />
                   <span />
                   <span />
@@ -180,7 +199,11 @@ export default function App({ api }) {
           {failed && (
             <div className="bp-error">
               Message not sent.{' '}
-              <button type="button" className="bp-retry" onClick={() => send(failed)}>
+              <button
+                type="button"
+                className="bp-retry"
+                onClick={() => send(failed)}
+              >
                 Try again
               </button>
             </div>
@@ -228,9 +251,12 @@ function Message({ message, onPick, disabled }) {
               <CheckIcon /> Booking confirmed
             </div>
             <div className="bp-card-row">{message.booking.service?.name}</div>
-            <div className="bp-card-row">{formatWhen(message.booking.starts_at)}</div>
+            <div className="bp-card-row">
+              {formatWhen(message.booking.starts_at)}
+            </div>
             <div className="bp-card-ref">
-              Reference <strong>{message.booking.reference}</strong> — keep this handy.
+              Reference <strong>{message.booking.reference}</strong> — keep this
+              handy.
             </div>
           </div>
         </div>
@@ -241,7 +267,9 @@ function Message({ message, onPick, disabled }) {
   return (
     <>
       <TextRow message={message} />
-      {message.slots && <SlotChips slots={message.slots} onPick={onPick} disabled={disabled} />}
+      {message.slots && (
+        <SlotChips slots={message.slots} onPick={onPick} disabled={disabled} />
+      )}
     </>
   )
 }
@@ -250,7 +278,9 @@ function TextRow({ message }) {
   const isUser = message.role === 'user'
   return (
     <div className={`bp-row${isUser ? ' bp-row-user' : ''}`}>
-      <div className={`bp-bubble ${isUser ? 'bp-bubble-user' : 'bp-bubble-agent'}`}>
+      <div
+        className={`bp-bubble ${isUser ? 'bp-bubble-user' : 'bp-bubble-agent'}`}
+      >
         {message.text}
       </div>
     </div>

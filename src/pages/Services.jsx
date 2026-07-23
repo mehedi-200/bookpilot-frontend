@@ -71,21 +71,23 @@ export default function Services() {
     <>
       <DataList
         columns={[
-          { key: 'name', header: 'Service', className: 'font-medium' },
+          { key: 'name', header: 'Service', className: 'font-medium w-1/2' },
           {
             key: 'duration_minutes',
             header: 'Duration',
-            className: 'text-ink-muted',
+            className: 'text-ink-muted w-32 tabular-nums',
             render: (s) => `${s.duration_minutes} min`,
           },
           {
             key: 'price',
             header: 'Price',
+            className: 'w-32 tabular-nums',
             render: (s) => Number(s.price).toFixed(2),
           },
           {
             key: 'active',
             header: 'Active',
+            className: 'w-24',
             render: (s) =>
               isAdmin ? (
                 <span onClick={(e) => e.stopPropagation()}>

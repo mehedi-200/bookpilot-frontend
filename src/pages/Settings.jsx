@@ -64,40 +64,37 @@ export default function Settings() {
         </p>
       </div>
 
-      {/* Side navigation on desktop, segmented control on mobile */}
-      <div className="grid gap-3 lg:grid-cols-[220px_1fr] lg:items-start">
-        <nav className="flex gap-1 rounded-xl border border-line bg-surface p-1.5 lg:flex-col lg:gap-0.5">
-          {TABS.map(({ label, icon: Icon, hint }) => (
-            <button
-              key={label}
-              type="button"
-              onClick={() => setTab(label)}
-              className={`flex min-h-10 flex-1 items-center gap-2.5 rounded-lg px-3 text-sm font-medium whitespace-nowrap transition-colors lg:flex-none ${
-                tab === label
-                  ? 'bg-accent text-accent-contrast'
-                  : 'text-ink-muted hover:bg-surface-2 hover:text-ink'
-              }`}
-            >
-              <Icon size={16} className="shrink-0" />
-              <span className="min-w-0">
-                <span className="block">{label}</span>
-                <span
-                  className={`hidden text-[11px] font-normal lg:block ${
-                    tab === label ? 'text-accent-contrast/75' : 'text-ink-muted'
-                  }`}
-                >
-                  {hint}
-                </span>
+      <div className="flex gap-1 overflow-x-auto rounded-xl border border-line bg-surface p-1.5">
+        {TABS.map(({ label, icon: Icon, hint }) => (
+          <button
+            key={label}
+            type="button"
+            onClick={() => setTab(label)}
+            className={`flex min-h-11 flex-1 items-center justify-center gap-2.5 rounded-lg px-4 whitespace-nowrap transition-colors ${
+              tab === label
+                ? 'bg-accent text-accent-contrast'
+                : 'text-ink-muted hover:bg-surface-2 hover:text-ink'
+            }`}
+          >
+            <Icon size={17} className="shrink-0" />
+            <span className="text-left">
+              <span className="block text-sm font-medium">{label}</span>
+              <span
+                className={`hidden text-[11px] sm:block ${
+                  tab === label ? 'text-accent-contrast/75' : 'text-ink-muted'
+                }`}
+              >
+                {hint}
               </span>
-            </button>
-          ))}
-        </nav>
+            </span>
+          </button>
+        ))}
+      </div>
 
-        <div className="min-w-0 space-y-3">
-          {tab === 'Business' && <BusinessTab />}
-          {tab === 'Working hours' && <HoursTab />}
-          {tab === 'Widget' && <WidgetTab />}
-        </div>
+      <div className="space-y-3">
+        {tab === 'Business' && <BusinessTab />}
+        {tab === 'Working hours' && <HoursTab />}
+        {tab === 'Widget' && <WidgetTab />}
       </div>
     </div>
   )
