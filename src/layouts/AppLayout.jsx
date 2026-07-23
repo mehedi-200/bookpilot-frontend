@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   Menu,
-  Bell,
   Search,
   MoreHorizontal,
   X,
@@ -14,7 +13,8 @@ import {
 import { NAV_ITEMS, BOTTOM_NAV, MORE_ITEMS, getPageTitle } from '@/layouts/nav'
 import { useTheme } from '@/hooks/useTheme'
 import { useAuth } from '@/hooks/useAuth'
-import SearchInput from '@/components/SearchInput'
+import MasterSearch from '@/components/MasterSearch'
+import NotificationBell from '@/components/NotificationBell'
 import { IconButton } from '@/components/Button'
 
 const SIDEBAR_KEY = 'bookpilot_sidebar_collapsed'
@@ -59,11 +59,7 @@ export default function AppLayout() {
           </NavLink>
         </div>
 
-        <SearchInput
-          placeholder="Search bookings, customers… ( / )"
-          className="w-full max-w-md shrink-0"
-          onChange={() => {}}
-        />
+        <MasterSearch />
 
         <div className="flex flex-1 items-center justify-end gap-1">
           <NotificationBell />
@@ -193,15 +189,6 @@ export default function AppLayout() {
         </div>
       )}
     </div>
-  )
-}
-
-function NotificationBell() {
-  // Real notifications arrive in Feature 9 — the bell is part of the fixed chrome.
-  return (
-    <IconButton label="Notifications">
-      <Bell size={19} />
-    </IconButton>
   )
 }
 
