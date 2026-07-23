@@ -7,6 +7,7 @@ import {
   X,
   User,
   LogOut,
+  ExternalLink,
   Palette,
   Rocket,
 } from 'lucide-react'
@@ -62,6 +63,15 @@ export default function AppLayout() {
         <MasterSearch />
 
         <div className="flex flex-1 items-center justify-end gap-1">
+          <a
+            href="/welcome"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mr-1 hidden items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink xl:flex"
+          >
+            <ExternalLink size={15} />
+            View site
+          </a>
           <NotificationBell />
           <ProfileMenu />
         </div>
@@ -251,6 +261,15 @@ function ProfileMenu() {
           >
             <User size={16} /> Profile
           </button>
+          <a
+            href="/welcome"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setOpen(false)}
+            className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-ink hover:bg-surface-2"
+          >
+            <ExternalLink size={16} /> View site
+          </a>
           <div className="my-1 border-t border-line" />
           <p className="flex items-center gap-2 px-3 pt-1.5 pb-1 text-xs text-ink-muted">
             <Palette size={13} /> Theme
