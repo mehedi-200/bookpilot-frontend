@@ -4,19 +4,31 @@ import {
   MessageSquare,
   CalendarCheck,
   Clock,
-  Bot,
   ShieldCheck,
   Wrench,
   Sparkles,
   Check,
+  LayoutDashboard,
+  Users,
 } from 'lucide-react'
 import Button from '@/components/Button'
+import { getToken } from '@/services/api'
+
+// One place decides where the calls-to-action point, based on sign-in state.
+function useCta() {
+  const loggedIn = !!getToken()
+  return {
+    to: loggedIn ? '/' : '/login',
+    label: loggedIn ? 'Go to dashboard' : 'Start free',
+  }
+}
 
 export default function Landing() {
   return (
     <>
       <Hero />
-      <LogosStrip />
+      <StatStrip />
+      <TwoSides />
       <Features />
       <HowItWorks />
       <ClosingCta />
@@ -27,9 +39,10 @@ export default function Landing() {
 /* ── Hero ─────────────────────────────────────────────────────────────── */
 
 function Hero() {
+  const cta = useCta()
+
   return (
     <section className="relative overflow-hidden">
-      {/* Soft accent glow behind the hero */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 -top-32 mx-auto h-64 max-w-3xl blur-3xl"
@@ -42,25 +55,24 @@ function Hero() {
       <div className="mx-auto max-w-4xl px-4 pt-16 pb-14 text-center sm:pt-24">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-ink-muted">
           <Sparkles size={13} className="text-accent" />
-          Powered by Claude
+          An AI booking assistant for small businesses
         </span>
 
         <h1 className="mt-5 text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-          Your AI receptionist that{' '}
-          <span className="text-accent">books appointments</span> around the
-          clock
+          Let AI answer, quote, and{' '}
+          <span className="text-accent">book your appointments</span>
         </h1>
 
         <p className="mx-auto mt-5 max-w-2xl text-base text-ink-muted sm:text-lg">
-          BookPilot chats with your customers, checks your real availability,
-          and fills your calendar — while you get on with the work. No missed
-          calls, no double bookings, no after-hours.
+          Add a chat assistant to your website that talks to customers, checks
+          your real availability, and books them in — 24 hours a day. You just
+          show up for the work.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link to="/login">
+          <Link to={cta.to}>
             <Button className="px-5">
-              Start free <ArrowRight size={16} />
+              {cta.label} <ArrowRight size={16} />
             </Button>
           </Link>
           <a href="#how">
@@ -80,10 +92,13 @@ function Hero() {
   )
 }
 
-// A little static mock of the widget, to show what customers see.
+// A static mock of the widget, so visitors see the product before signing up.
 function ChatPreview() {
   return (
     <div className="mx-auto mt-12 max-w-md">
+      <p className="mb-2 text-xs font-medium tracking-wide text-ink-muted uppercase">
+        What your customers see
+      </p>
       <div className="overflow-hidden rounded-2xl border border-line bg-surface text-left shadow-xl">
         <div className="flex items-center gap-2.5 border-b border-line px-4 py-3">
           <span className="flex size-8 items-center justify-center rounded-full bg-accent text-accent-contrast">
@@ -126,9 +141,9 @@ function Bubble({ agent, children }) {
   )
 }
 
-/* ── Social proof ─────────────────────────────────────────────────────── */
+/* ── Stat strip ───────────────────────────────────────────────────────── */
 
-function LogosStrip() {
+function StatStrip() {
   const stats = [
     ['24/7', 'Always answering'],
     ['< 1 min', 'To go live'],
@@ -152,6 +167,69 @@ function LogosStrip() {
   )
 }
 
+/* ── Two sides ────────────────────────────────────────────────────────── */
+
+// The clearest way to explain what BookPilot is: show both halves.
+function TwoSides() {
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
+      <div className="mx-auto max-w-2xl text-center">
+        <h2 className="text-2xl font-semibold text-ink sm:text-3xl">
+          One assistant, two happy sides
+        </h2>
+        <p className="mt-3 text-ink-muted">
+          Customers get instant answers. You get a calendar that fills itself.
+        </p>
+      </div>
+
+      <div className="mt-10 grid gap-4 md:grid-cols-2">
+        <SideCard
+          icon={MessageSquare}
+          eyebrow="For your customers"
+          title="Book in a quick chat"
+          points={[
+            'Ask in plain language, any time of day',
+            'See real openings — no “we’ll call you back”',
+            'Confirmed on the spot, with a reference',
+          ]}
+        />
+        <SideCard
+          icon={LayoutDashboard}
+          eyebrow="For you"
+          title="Run it all from one dashboard"
+          points={[
+            'Every booking, customer, and chat in one place',
+            'Confirm, reschedule, or cancel in a click',
+            'See exactly what the AI said and did',
+          ]}
+        />
+      </div>
+    </section>
+  )
+}
+
+function SideCard({ icon: Icon, eyebrow, title, points }) {
+  return (
+    <div className="rounded-2xl border border-line bg-surface p-6">
+      <span className="flex size-11 items-center justify-center rounded-xl bg-accent/12 text-accent">
+        <Icon size={20} />
+      </span>
+      <p className="mt-4 text-xs font-medium tracking-wide text-accent uppercase">
+        {eyebrow}
+      </p>
+      <h3 className="mt-1 text-lg font-semibold text-ink">{title}</h3>
+      <ul className="mt-4 space-y-2.5">
+        {points.map((point) => (
+          <li key={point} className="flex items-start gap-2 text-sm text-ink">
+            <Check size={16} className="mt-0.5 shrink-0 text-ok" />
+            {point}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 /* ── Features ─────────────────────────────────────────────────────────── */
 
 const FEATURES = [
@@ -163,12 +241,12 @@ const FEATURES = [
   {
     icon: CalendarCheck,
     title: 'Never double-books',
-    body: 'Every time it offers comes straight from your real calendar and working hours. The slot is locked the moment it’s taken.',
+    body: 'Every time it offers comes from your real calendar and hours. The slot is locked the moment it’s taken.',
   },
   {
     icon: Clock,
     title: 'Works after hours',
-    body: 'Most bookings happen when you’re closed. BookPilot answers at midnight so you wake up to a full day.',
+    body: 'Most enquiries come when you’re closed. BookPilot answers at midnight so you wake up to a full day.',
   },
   {
     icon: ShieldCheck,
@@ -181,9 +259,9 @@ const FEATURES = [
     body: 'Confirmed bookings sync into GarageFlow as service jobs automatically — no re-typing anything.',
   },
   {
-    icon: Bot,
-    title: 'Set up in minutes',
-    body: 'Add your services and hours, paste one line onto your website, and the assistant is live.',
+    icon: Users,
+    title: 'Builds your customer list',
+    body: 'Every chat becomes a customer record, matched by phone, so you never lose track of who booked what.',
   },
 ]
 
@@ -191,30 +269,32 @@ function Features() {
   return (
     <section
       id="features"
-      className="mx-auto max-w-6xl scroll-mt-16 px-4 py-16 sm:py-20"
+      className="scroll-mt-16 border-y border-line bg-surface"
     >
-      <div className="mx-auto max-w-2xl text-center">
-        <h2 className="text-2xl font-semibold text-ink sm:text-3xl">
-          Everything a receptionist does. None of the overheads.
-        </h2>
-        <p className="mt-3 text-ink-muted">
-          BookPilot handles the back-and-forth so your calendar fills itself.
-        </p>
-      </div>
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-2xl font-semibold text-ink sm:text-3xl">
+            Everything a receptionist does. None of the overheads.
+          </h2>
+          <p className="mt-3 text-ink-muted">
+            BookPilot handles the back-and-forth so your calendar fills itself.
+          </p>
+        </div>
 
-      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {FEATURES.map(({ icon: Icon, title, body }) => (
-          <div
-            key={title}
-            className="rounded-xl border border-line bg-surface p-5 transition-colors hover:border-accent"
-          >
-            <span className="flex size-10 items-center justify-center rounded-lg bg-accent/12 text-accent">
-              <Icon size={19} />
-            </span>
-            <h3 className="mt-4 text-base font-semibold text-ink">{title}</h3>
-            <p className="mt-1.5 text-sm text-ink-muted">{body}</p>
-          </div>
-        ))}
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map(({ icon: Icon, title, body }) => (
+            <div
+              key={title}
+              className="rounded-xl border border-line bg-app p-5 transition-colors hover:border-accent"
+            >
+              <span className="flex size-10 items-center justify-center rounded-lg bg-accent/12 text-accent">
+                <Icon size={19} />
+              </span>
+              <h3 className="mt-4 text-base font-semibold text-ink">{title}</h3>
+              <p className="mt-1.5 text-sm text-ink-muted">{body}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   )
@@ -239,31 +319,35 @@ const STEPS = [
 
 function HowItWorks() {
   return (
-    <section id="how" className="scroll-mt-16 border-y border-line bg-surface">
-      <div className="mx-auto max-w-5xl px-4 py-16 sm:py-20">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-2xl font-semibold text-ink sm:text-3xl">
-            Live in three steps
-          </h2>
-          <p className="mt-3 text-ink-muted">
-            No integrations to wrangle, no training required.
-          </p>
-        </div>
-
-        <ol className="mt-10 grid gap-6 md:grid-cols-3">
-          {STEPS.map((step, index) => (
-            <li key={step.title} className="relative">
-              <span className="flex size-10 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-contrast">
-                {index + 1}
-              </span>
-              <h3 className="mt-4 text-base font-semibold text-ink">
-                {step.title}
-              </h3>
-              <p className="mt-1.5 text-sm text-ink-muted">{step.body}</p>
-            </li>
-          ))}
-        </ol>
+    <section
+      id="how"
+      className="mx-auto max-w-5xl scroll-mt-16 px-4 py-16 sm:py-20"
+    >
+      <div className="mx-auto max-w-2xl text-center">
+        <h2 className="text-2xl font-semibold text-ink sm:text-3xl">
+          Live in three steps
+        </h2>
+        <p className="mt-3 text-ink-muted">
+          No integrations to wrangle, no training required.
+        </p>
       </div>
+
+      <ol className="mt-10 grid gap-6 md:grid-cols-3">
+        {STEPS.map((step, index) => (
+          <li
+            key={step.title}
+            className="rounded-xl border border-line bg-surface p-5"
+          >
+            <span className="flex size-10 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-contrast">
+              {index + 1}
+            </span>
+            <h3 className="mt-4 text-base font-semibold text-ink">
+              {step.title}
+            </h3>
+            <p className="mt-1.5 text-sm text-ink-muted">{step.body}</p>
+          </li>
+        ))}
+      </ol>
     </section>
   )
 }
@@ -271,10 +355,11 @@ function HowItWorks() {
 /* ── Closing CTA ──────────────────────────────────────────────────────── */
 
 function ClosingCta() {
+  const cta = useCta()
   const points = ['Free to start', 'Live in minutes', 'Cancel anytime']
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
+    <section className="mx-auto max-w-6xl px-4 pb-16 sm:pb-20">
       <div className="relative overflow-hidden rounded-2xl border border-line bg-surface px-6 py-12 text-center sm:px-12">
         <div
           aria-hidden
@@ -292,9 +377,9 @@ function ClosingCta() {
         </p>
 
         <div className="mt-7 flex justify-center">
-          <Link to="/login">
+          <Link to={cta.to}>
             <Button className="px-6">
-              Get started free <ArrowRight size={16} />
+              {cta.label} <ArrowRight size={16} />
             </Button>
           </Link>
         </div>

@@ -1,18 +1,19 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
-import { Rocket, Sun, Moon, BookOpen } from 'lucide-react'
+import { Rocket, Sun, Moon, BookOpen, LayoutDashboard } from 'lucide-react'
 import Button from '@/components/Button'
 import { useTheme } from '@/hooks/useTheme'
+import { getToken } from '@/services/api'
 
-// Marketing chrome — deliberately unlike the app's dashboard shell: no sidebar,
-// a centred nav, and a full footer.
+// Marketing chrome — the same header on every public page, including login, so
+// the site never feels like it switches identity mid-flow.
 export default function PublicLayout() {
   return (
     <div className="flex min-h-dvh flex-col bg-app">
-      <PublicHeader />
-      <main className="flex-1">
+      <SiteHeader />
+      <main className="flex flex-1 flex-col">
         <Outlet />
       </main>
-      <PublicFooter />
+      <SiteFooter />
     </div>
   )
 }
@@ -40,7 +41,11 @@ function ThemeToggle() {
   )
 }
 
-function PublicHeader() {
+function SiteHeader() {
+  // Once you're signed in, the header offers your dashboard instead of a
+  // pointless "log in" it already knows you don't need.
+  const loggedIn = !!getToken()
+
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-app/80 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4">
@@ -52,11 +57,11 @@ function PublicHeader() {
         </Link>
 
         <nav className="ml-6 hidden items-center gap-1 md:flex">
-          <HeaderLink to="/welcome" hash="#features">
-            Features
-          </HeaderLink>
           <HeaderLink to="/welcome" hash="#how">
             How it works
+          </HeaderLink>
+          <HeaderLink to="/welcome" hash="#features">
+            Features
           </HeaderLink>
           <NavLink
             to="/pricing"
@@ -72,14 +77,25 @@ function PublicHeader() {
 
         <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />
-          <Link to="/login" className="hidden sm:block">
-            <span className="rounded-lg px-3 py-1.5 text-sm font-medium text-ink-muted transition-colors hover:text-ink">
-              Log in
-            </span>
-          </Link>
-          <Link to="/login">
-            <Button>Get started</Button>
-          </Link>
+
+          {loggedIn ? (
+            <Link to="/">
+              <Button>
+                <LayoutDashboard size={16} /> Dashboard
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <Link to="/login" className="hidden sm:block">
+                <span className="rounded-lg px-3 py-1.5 text-sm font-medium text-ink-muted transition-colors hover:text-ink">
+                  Log in
+                </span>
+              </Link>
+              <Link to="/login">
+                <Button>Get started</Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
@@ -98,7 +114,7 @@ function HeaderLink({ to, hash, children }) {
   )
 }
 
-function PublicFooter() {
+function SiteFooter() {
   return (
     <footer className="border-t border-line">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-center">

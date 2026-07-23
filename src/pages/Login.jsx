@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useNavigate, useSearchParams, Link } from 'react-router-dom'
-import { Rocket, Eye, EyeOff, AlertCircle, ArrowLeft } from 'lucide-react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Eye, EyeOff, AlertCircle } from 'lucide-react'
 import Button from '@/components/Button'
 import { Input } from '@/components/Field'
 import { useAuth } from '@/hooks/useAuth'
@@ -39,82 +39,62 @@ export default function Login() {
     }
   }
 
+  // Rendered inside PublicLayout, so it inherits the shared site header.
   return (
-    <div className="flex min-h-dvh flex-col bg-app">
-      {/* Header — a way back to the marketing site */}
-      <header className="border-b border-line">
-        <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
-          <Link to="/welcome" className="flex items-center gap-2">
-            <span className="flex size-7 items-center justify-center rounded-lg bg-accent text-accent-contrast">
-              <Rocket size={16} />
-            </span>
-            <span className="text-base font-semibold text-ink">BookPilot</span>
-          </Link>
-          <Link
-            to="/welcome"
-            className="ml-auto flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
-          >
-            <ArrowLeft size={15} />
-            Back to site
-          </Link>
+    <div className="flex flex-1 items-center justify-center p-4 py-12">
+      <form
+        onSubmit={submit}
+        className="w-full max-w-sm rounded-xl border border-line bg-surface p-6 lg:p-8"
+      >
+        <div className="mb-6 text-center">
+          <h1 className="text-lg font-semibold text-ink">Welcome back</h1>
+          <p className="text-sm text-ink-muted">
+            Sign in to your BookPilot dashboard
+          </p>
         </div>
-      </header>
 
-      <div className="flex flex-1 items-center justify-center p-4">
-        <form
-          onSubmit={submit}
-          className="w-full max-w-sm rounded-xl border border-line bg-surface p-6 lg:p-8"
-        >
-          <div className="mb-6 text-center">
-            <h1 className="text-lg font-semibold text-ink">Welcome back</h1>
-            <p className="text-sm text-ink-muted">
-              Sign in to your BookPilot dashboard
-            </p>
+        {error && (
+          <div className="mb-4 flex items-start gap-2 rounded-lg border border-danger/30 bg-danger/10 p-3 text-sm text-danger">
+            <AlertCircle size={16} className="mt-0.5 shrink-0" />
+            {error}
           </div>
+        )}
 
-          {error && (
-            <div className="mb-4 flex items-start gap-2 rounded-lg border border-danger/30 bg-danger/10 p-3 text-sm text-danger">
-              <AlertCircle size={16} className="mt-0.5 shrink-0" />
-              {error}
-            </div>
-          )}
-
-          <div className="space-y-4">
+        <div className="space-y-4">
+          <Input
+            label="Email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@business.com"
+            autoComplete="email"
+          />
+          <div className="relative">
             <Input
-              label="Email"
-              type="email"
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@business.com"
-              autoComplete="email"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              autoComplete="current-password"
+              className="pr-10"
             />
-            <div className="relative">
-              <Input
-                label="Password"
-                type={showPassword ? 'text' : 'password'}
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                autoComplete="current-password"
-                className="pr-10"
-              />
-              <button
-                type="button"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                onClick={() => setShowPassword((s) => !s)}
-                className="absolute right-3 bottom-2.5 text-ink-muted hover:text-ink lg:bottom-2"
-              >
-                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-              </button>
-            </div>
-            <Button type="submit" className="w-full" loading={loading}>
-              Sign in
-            </Button>
+            <button
+              type="button"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              onClick={() => setShowPassword((s) => !s)}
+              className="absolute right-3 bottom-2.5 text-ink-muted hover:text-ink lg:bottom-2"
+            >
+              {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+            </button>
           </div>
-        </form>
-      </div>
+          <Button type="submit" className="w-full" loading={loading}>
+            Sign in
+          </Button>
+        </div>
+      </form>
     </div>
   )
 }

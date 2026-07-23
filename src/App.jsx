@@ -25,13 +25,12 @@ import ConversationDetail from '@/pages/conversations/ConversationDetail'
 function App() {
   return (
     <Routes>
-      {/* Public marketing pages — the product's front door */}
+      {/* Public pages — all share one header, login included */}
       <Route element={<PublicLayout />}>
         <Route path="/welcome" element={<Landing />} />
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/login" element={<Login />} />
       </Route>
-
-      <Route path="/login" element={<Login />} />
 
       <Route
         element={
