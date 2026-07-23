@@ -1,7 +1,16 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { CalendarClock, Clock, User, Package, StickyNote, History } from 'lucide-react'
+import {
+  CalendarClock,
+  Clock,
+  User,
+  Package,
+  StickyNote,
+  History,
+  Wrench,
+  RefreshCw,
+} from 'lucide-react'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import Modal from '@/components/Modal'
@@ -12,6 +21,7 @@ import SlotPicker from '@/components/SlotPicker'
 import { Input } from '@/components/Field'
 import { useToast } from '@/components/Toast'
 import { bookingService } from '@/services/bookingService'
+import { integrationService } from '@/services/integrationService'
 import { friendlyDateTime } from '@/utils/dates'
 import { SourceIcon } from '@/pages/Bookings'
 
@@ -121,6 +131,11 @@ export default function BookingDetail() {
               </span>
             </Row>
           )}
+          {booking.sync_status && (
+            <Row icon={Wrench} label="GarageFlow">
+              <SyncStatus booking={booking} onSynced={invalidate} />
+            </Row>
+          )}
         </dl>
       </Card>
 
@@ -219,6 +234,46 @@ export default function BookingDetail() {
       </Modal>
     </div>
   )
+}
+
+// Sync is best-effort and never blocks a booking — so when it fails the fix is
+// one click away rather than a mystery.
+function SyncStatus({ booking, onSynced }) {
+  const toast = useToast()
+
+  const retry = useMutation({
+    mutationFn: () => integrationService.syncBooking(booking.id),
+    onSuccess: () => {
+      onSynced()
+      toast.success('Sent to GarageFlow')
+    },
+    onError: (err) =>
+      toast.error(err.response?.data?.message ?? 'Could not send to GarageFlow'),
+  })
+
+  if (booking.sync_status === 'synced') {
+    return (
+      <span className="flex flex-wrap items-center gap-2">
+        <StatusChip tone="ok">in GarageFlow</StatusChip>
+        {booking.garageflow_job_id && (
+          <span className="text-xs text-ink-muted">job #{booking.garageflow_job_id}</span>
+        )}
+      </span>
+    )
+  }
+
+  if (booking.sync_status === 'failed') {
+    return (
+      <span className="flex flex-wrap items-center gap-2">
+        <StatusChip tone="danger">sync failed</StatusChip>
+        <Button variant="ghost" loading={retry.isPending} onClick={() => retry.mutate()}>
+          <RefreshCw size={14} /> Retry
+        </Button>
+      </span>
+    )
+  }
+
+  return <StatusChip tone="warn">syncing…</StatusChip>
 }
 
 function Row({ icon: Icon, label, children }) {

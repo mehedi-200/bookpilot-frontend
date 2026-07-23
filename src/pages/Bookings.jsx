@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Plus, CalendarX, Bot, Hand, X } from 'lucide-react'
+import { Plus, CalendarX, Bot, Hand, X, AlertTriangle } from 'lucide-react'
 import DataList from '@/components/DataList'
 import Button from '@/components/Button'
 import SearchInput from '@/components/SearchInput'
@@ -110,7 +110,23 @@ export default function Bookings() {
 
       <DataList
         columns={[
-          { key: 'reference', header: 'Ref', className: 'font-medium whitespace-nowrap' },
+          {
+            key: 'reference',
+            header: 'Ref',
+            className: 'font-medium whitespace-nowrap',
+            render: (b) => (
+              <span className="flex items-center gap-1.5">
+                {b.reference}
+                {b.sync_status === 'failed' && (
+                  <AlertTriangle
+                    size={13}
+                    className="text-danger"
+                    title="Failed to sync to GarageFlow"
+                  />
+                )}
+              </span>
+            ),
+          },
           {
             key: 'customer',
             header: 'Customer',
