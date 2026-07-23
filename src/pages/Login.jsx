@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { Rocket, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import Button from '@/components/Button'
 import { Input } from '@/components/Field'
@@ -46,9 +46,12 @@ export default function Login() {
         className="w-full max-w-sm rounded-xl border border-line bg-surface p-6 lg:p-8"
       >
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
-          <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-accent-contrast">
+          <Link
+            to="/welcome"
+            className="flex size-11 items-center justify-center rounded-xl bg-accent text-accent-contrast"
+          >
             <Rocket size={22} />
-          </span>
+          </Link>
           <h1 className="text-lg font-semibold text-ink">BookPilot</h1>
           <p className="text-sm text-ink-muted">
             Welcome back — sign in to continue
