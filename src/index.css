@@ -1,3 +1,88 @@
 @import 'tailwindcss';
 
-/* Theme tokens (dark / light / reading) are defined in Feature 1 — app-shell. */
+/* ── BookPilot theme tokens ─────────────────────────────────────────────
+   Three themes switched by a class on <html>: dark (DEFAULT) / light / reading.
+   Components must ONLY use these tokens — never hardcoded colors. */
+
+:root.dark {
+  --bg: #0b0e14;
+  --surface: #141a24;
+  --surface-2: #1c2431;
+  --line: #283245;
+  --ink: #e7ebf3;
+  --ink-muted: #8c96aa;
+  --accent: #6366f1;
+  --accent-contrast: #ffffff;
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --grape: #a78bfa;
+}
+
+:root.light {
+  --bg: #f4f5f8;
+  --surface: #ffffff;
+  --surface-2: #eef0f4;
+  --line: #dfe4ec;
+  --ink: #1b2333;
+  --ink-muted: #5d6675;
+  --accent: #4f46e5;
+  --accent-contrast: #ffffff;
+  --ok: #16a34a;
+  --warn: #d97706;
+  --danger: #dc2626;
+  --grape: #7c3aed;
+}
+
+:root.reading {
+  --bg: #f3ebdd;
+  --surface: #faf4e7;
+  --surface-2: #ede3d0;
+  --line: #d9cbb0;
+  --ink: #3a3126;
+  --ink-muted: #796e5b;
+  --accent: #5b54c9;
+  --accent-contrast: #ffffff;
+  --ok: #3f7d43;
+  --warn: #a8681c;
+  --danger: #b3403a;
+  --grape: #7a5ca8;
+}
+
+/* Map tokens to Tailwind utilities (bg-app, bg-surface, border-line,
+   text-ink, text-ink-muted, bg-accent, text-ok …) */
+@theme inline {
+  --color-app: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-accent: var(--accent);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --color-grape: var(--grape);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Native inputs (date/time/select) follow the theme */
+:root.dark {
+  color-scheme: dark;
+}
+:root.light,
+:root.reading {
+  color-scheme: light;
+}
